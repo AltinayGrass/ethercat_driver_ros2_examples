@@ -3,7 +3,7 @@
 
   <link name="world"/>
 
-  <xacro:include filename="$(find ethercat_motor_drive)/description/ros2_control/motor_drive.ros2_control.xacro" />
+  <xacro:include filename="$(find ethercat_motor_drive)/description/ros2_control/motor_drive_vel.ros2_control.xacro" />
 
   <xacro:motor_drive/>
 </robot>
