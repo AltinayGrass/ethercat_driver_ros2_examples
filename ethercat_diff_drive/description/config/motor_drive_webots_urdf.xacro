@@ -1,0 +1,399 @@
+<?xml version="1.0"?>
+<robot name="motor_drive" xmlns:xacro="http://www.ros.org/wiki/xacro" >
+
+<material name="Blue">
+  <color rgba="0.0 0.0 0.8 1.0"/>
+</material>
+
+<material name="Green">
+  <color rgba="0.0 0.8 0.0 1.0"/>
+</material>
+
+<material name="Grey">
+  <color rgba="0.7 0.7 0.7 1.0"/>
+</material>
+
+<material name="LightGrey">
+  <color rgba="0.9 0.9 0.9 1.0"/>
+</material>
+
+<material name="DarkGrey">
+  <color rgba="0.1 0.1 0.1 1.0"/>
+</material>
+
+<material name="Red">
+  <color rgba="0.8 0.0 0.0 1.0"/>
+</material>
+
+<material name="White">
+  <color rgba="1.0 1.0 1.0 1.0"/>
+</material>
+
+<material name="Yellow">
+  <color rgba="0.96 0.88 0.14 1.0"/>
+</material>
+
+<material name="Black">
+  <color rgba="0.0 0.0 0.0 1.0"/>
+</material>
+
+<material name="FlatBlack">
+  <color rgba="0.09 0.09 0.09 1.0"/>
+</material>
+
+<material name="Orange">
+  <color rgba="1.0 0.487 0.0 1.0"/>
+</material>
+
+<material name="pal/Orange">
+  <color rgba="0.91373 0.61568 0.29411 1.0"/>
+</material>
+
+<material name="pal/DarkGrey">
+  <color rgba="0.29804 0.29804 0.29804 1"/>
+</material>
+  
+<!-- PROPERTIES -->
+<xacro:property name="base_laser_x" value="0.202"/>
+<xacro:property name="base_laser_y" value="0.0"/>
+<xacro:property name="base_laser_z" value="-0.004"/>
+<xacro:property name="deg_to_rad" value="0.01745329251994329577" />
+
+<!-- Wheel characteristics -->
+<xacro:property name="wheel_radius" value="0.0985"/>
+<xacro:property name="wheel_width" value="0.040"/>
+<xacro:property name="wheel_separation" value="0.4044"/>
+<xacro:property name="wheel_torque" value="6.0"/>
+<xacro:property name="wheel_velocity" value="1.0"/>
+
+<!-- Caster wheel characteristics -->
+<xacro:property name="caster_radius" value="0.025"/>
+<xacro:property name="caster_width" value="0.015"/>
+<xacro:property name="caster_separation_x" value="0.343"/>
+<xacro:property name="caster_separation_y" value="0.204"/>
+<xacro:property name="caster_offset_x" value="-0.002"/>
+<xacro:property name="caster_offset_y" value="0.0"/>
+<xacro:property name="caster_offset_z" value="-0.0335"/>
+
+<!-- MACRO DEFINITION-->
+<xacro:macro name="base" params="name">
+
+  <!-- Base -->
+  <link name="${name}_link">
+    <inertial>
+      <origin xyz="-0.00000106 0.00000109 0.0000387" rpy="0 0 0"/>
+      <mass value="28.26649"/>
+      <inertia ixx="0.465408937" ixy="0.002160024" ixz="-0.001760255" iyy="0.483193291" iyz="-0.000655952" izz="0.550939703"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="https://raw.githubusercontent.com/pal-robotics/pmb2_robot/humble-devel/pmb2_description/meshes/base/base.stl" />
+      </geometry>
+      <material name="White" />
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="https://raw.githubusercontent.com/pal-robotics/pmb2_robot/humble-devel/pmb2_description/meshes/base/high_resolution/base_collision.stl" />
+      </geometry>
+      <material name="White" />
+    </collision>
+  </link>
+
+  <!-- Base footprint -->
+  <link name="${name}_footprint">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+  </link>
+
+  <joint name="${name}_footprint_joint" type="fixed">
+    <origin xyz="0 0 ${wheel_radius}" rpy="0 0 0" />
+    <child link="${name}_link" />
+    <parent link="${name}_footprint"/>
+  </joint>
+</xacro:macro>
+
+<xacro:base name="base"/>
+
+  <!-- MACRO DEFINITION -->
+  <xacro:macro name="cover" params="name parent">
+
+    <link name="${name}_link">
+      <inertial>
+        <origin xyz="0.22414000000 0.00002000000 0.04681000000" rpy="0 0 0"/>
+        <mass value="0.25821000000"/>
+        <inertia ixx="0.00023719188" ixy="0.00000006119" ixz="-0.00000011799" iyy="0.00028335052" iyz="0.00000000774" izz="0.00038497063"/>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0.13" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="https://raw.githubusercontent.com/pal-robotics/pmb2_robot/humble-devel/pmb2_description/meshes/base/base_ring.stl"/>
+        </geometry>
+        <material name="Orange"/>
+      </visual>
+    </link>
+
+    <joint name="cover_joint" type="fixed">
+      <parent link="${parent}"/>
+      <child link="${name}_link"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </joint>
+
+  </xacro:macro>
+  
+  <!-- Orange cover -->
+  <xacro:cover name="cover" parent="base_footprint"/>
+
+  <!-- MACRO DEFINITION -->
+  <xacro:macro name="antenna" params="name parent *origin">
+
+    <link name="${name}_link">
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.000001"/>
+        <inertia ixx="0.00000002371" ixy="0.00000006119" ixz="0.00000001179" iyy="0.00000002833" iyz="0.00000000774" izz="0.00000003849"/>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="https://raw.githubusercontent.com/pal-robotics/pmb2_robot/humble-devel/pmb2_description/meshes/objects/antenna.stl"/>
+        </geometry>
+        <material name="Black"/>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0.085" rpy="0 0 0"/>
+        <geometry>
+          <cylinder radius="0.005" length="0.17"/>
+        </geometry>
+        <material name="Black"/>
+      </collision>
+    </link>
+
+    <joint name="${name}_joint" type="fixed">
+      <parent link="${parent}"/>
+      <child link="${name}_link"/>
+      <xacro:insert_block name="origin"/>
+    </joint>
+
+  </xacro:macro>
+
+  <!-- Antennas -->
+  <xacro:antenna name="base_antenna_left" parent="base_link">
+    <origin xyz="-0.201 0.1062 0.195" rpy="0 0 0"/>
+  </xacro:antenna>
+  <xacro:antenna name="base_antenna_right" parent="base_link">
+    <origin xyz="-0.201 -0.1062 0.195" rpy="0 0 0"/>
+  </xacro:antenna>
+
+  <xacro:macro name="wheel" params="side reflect radius width torque velocity separation parent">
+    <link name="wheel_${side}_link">
+      <inertial>
+        <origin xyz="0 0 ${-0.00207 * reflect}" rpy="0 0 0"/>
+        <mass value="1.82362"/>
+        <inertia ixx="0.00499743171" ixy="${ 0.00000004464 * reflect}" ixz="-0.00000002245" iyy="0.00499741733" iyz="${-0.00000000164 * reflect}" izz="0.00839239692"/>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="${-90.0 * (1 - reflect) * deg_to_rad} 0 0"/>
+        <geometry>
+          <mesh filename="https://raw.githubusercontent.com/pal-robotics/pmb2_robot/humble-devel/pmb2_description/meshes/wheels/wheel.stl"/>
+        </geometry>
+        <material name="DarkGrey"/>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <cylinder radius="${radius}" length="${width}"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="suspension_${side}_link">
+      <inertial>
+        <origin xyz="0 0 -0.02" rpy="0 0 0"/>
+        <mass value="10"/>
+        <inertia ixx="1.0" ixy="0" ixz="0" iyy="1.0" iyz="0" izz="1.0"/>
+      </inertial>
+      <kinematic>0</kinematic>
+      <gravity>1</gravity>
+    </link>
+
+
+    <joint name="suspension_${side}_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <axis xyz="0 0 1"/>
+      <child link="suspension_${side}_link"/>
+      <parent link="${parent}"/>
+    </joint>
+
+
+    <joint name="wheel_${side}_joint" type="continuous">
+      <parent link="suspension_${side}_link"/>
+      <child link="wheel_${side}_link"/>
+      <origin xyz="0 ${-separation / 2 * reflect} 0.0" rpy="${-90.0 * deg_to_rad} 0 0"/>
+      <axis xyz="0 0 1"/>
+      <limit effort="${torque}" velocity="${velocity / radius}"/>
+      <dynamics damping="1.0" friction="2.0"/>
+    </joint>
+
+  </xacro:macro>
+
+  <!-- Wheels -->
+  <xacro:wheel side="right" reflect=" 1.0" radius="${wheel_radius}" width="${wheel_width}" torque="${wheel_torque}" velocity="${wheel_velocity}" separation="${wheel_separation}" parent="base_link"/>
+  <xacro:wheel side="left" reflect="-1.0" radius="${wheel_radius}" width="${wheel_width}" torque="${wheel_torque}" velocity="${wheel_velocity}" separation="${wheel_separation}" parent="base_link"/>
+
+  <xacro:macro name="caster" params="side radius width separation_x separation_y offset_x offset_y offset_z parent">
+    <link name="caster_${side}_1_link">
+      <inertial>
+        <origin xyz="-0.00634599 0.00005347 -0.02037519" rpy="0 0 0"/>
+        <mass value="0.05144761"/>
+        <inertia ixx="0.00001513" ixy="-0.00000003" ixz="0.00000267" iyy="0.00001309" iyz="-0.00000005" izz="0.00001198"/>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="https://raw.githubusercontent.com/pal-robotics/pmb2_robot/humble-devel/pmb2_description/meshes/wheels/caster_1.stl"/>
+        </geometry>
+        <material name="Grey"/>
+      </visual>
+      <!--collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <cylinder radius="${radius}" length="${width}"/>
+        </geometry>
+      </collision-->
+    </link>
+
+    <link name="caster_${side}_2_link">
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.08855784"/>
+        <inertia ixx="0.00001075" ixy="0" ixz="0" iyy="0.00001541" iyz="0" izz="0.00001075"/>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="https://raw.githubusercontent.com/pal-robotics/pmb2_robot/humble-devel/pmb2_description/meshes/wheels/caster_2.stl"/>
+        </geometry>
+        <material name="DarkGrey"/>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <sphere radius="${radius}" />
+        </geometry>
+      </collision>
+    </link>
+
+    <joint name="caster_${side}_1_joint" type="fixed">
+      <parent link="${parent}"/>
+      <child link="caster_${side}_1_link"/>
+      <origin xyz="${offset_x + separation_x / 2} ${offset_y - separation_y / 2} ${offset_z}" rpy="0 0 0"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <joint name="caster_${side}_2_joint" type="fixed">
+      <parent link="caster_${side}_1_link"/>
+      <child link="caster_${side}_2_link"/>
+      <origin xyz="-0.016 0.0000 -0.040" rpy="${-90.0 * deg_to_rad} 0 0"/>
+      <axis xyz="0 1 0"/>
+    </joint>
+
+  </xacro:macro>
+
+  <!-- Casters wheels -->
+  <xacro:caster side="front_right" radius="${caster_radius}" width="${caster_width}" separation_x="${ caster_separation_x}" separation_y="${ caster_separation_y}" offset_x="${caster_offset_x}" offset_y="${caster_offset_y}" offset_z="${caster_offset_z}" parent="base_link"/>
+  <xacro:caster side="front_left" radius="${caster_radius}" width="${caster_width}" separation_x="${ caster_separation_x}" separation_y="${-caster_separation_y}" offset_x="${caster_offset_x}" offset_y="${caster_offset_y}" offset_z="${caster_offset_z}" parent="base_link"/>
+  <xacro:caster side="back_right" radius="${caster_radius}" width="${caster_width}" separation_x="${-caster_separation_x}" separation_y="${ caster_separation_y}" offset_x="${caster_offset_x}" offset_y="${caster_offset_y}" offset_z="${caster_offset_z}" parent="base_link"/>
+  <xacro:caster side="back_left" radius="${caster_radius}" width="${caster_width}" separation_x="${-caster_separation_x}" separation_y="${-caster_separation_y}" offset_x="${caster_offset_x}" offset_y="${caster_offset_y}" offset_z="${caster_offset_z}" parent="base_link"/>
+
+
+  <!-- Theoretic FOV = 220 -->
+
+    <xacro:macro name="hokuyo_urg_04lx_ug01_laser" params="name parent *origin min_angle max_angle">
+
+    <link name="${name}" type="laser">
+      <inertial>
+        <origin xyz="0 0 -0.04480000000" rpy="0 0 0"/>
+        <mass value="0.22963000000"/>
+        <inertia ixx="0.00003393164" ixy="0.00000064943" ixz="0.00000000000" iyy="0.00001849658" iyz="0.00000000000" izz="0.00005027615"/>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="https://raw.githubusercontent.com/pal-robotics/pmb2_robot/humble-devel/pmb2_description/meshes/sensors/hokuyo_urg_04lx_ug01.stl"/>
+          <!-- <cylinder radius="0.0508" length="0.055"/> -->
+        </geometry>
+        <material name="DarkGrey"/>
+      </visual>
+    </link>
+
+    <joint name="${name}_joint" type="fixed">
+      <axis xyz="0 1 0"/>
+      <xacro:insert_block name="origin"/>
+      <parent link="${parent}"/>
+      <child link="${name}"/>
+    </joint>
+
+  </xacro:macro>
+
+  <xacro:hokuyo_urg_04lx_ug01_laser name="hokuyo" parent="base_link" min_angle="${-110 * deg_to_rad}" max_angle="${110 * deg_to_rad}">
+    <origin xyz="${base_laser_x} ${base_laser_y} ${base_laser_z}" rpy="0 0 0" />
+  </xacro:hokuyo_urg_04lx_ug01_laser>
+
+
+<webots>
+      <device reference="hokuyo" type="Lidar">
+          <ros>
+              <enabled>true</enabled>
+              <updateRate>10</updateRate>
+              <topicName>/scan</topicName>
+              <alwaysOn>true</alwaysOn>
+              <frameName>hokuyo</frameName>
+          </ros>
+      </device>
+      <plugin type="webots_ros2_control::Ros2Control" />
+      <!-- <plugin>ethercat_driver/EthercatDriver</plugin> -->
+</webots> 
+<ros2_control name="WebotsControl" type="system">
+  <hardware>
+      <plugin>webots_ros2_control::Ros2ControlSystem</plugin>
+<!--       <plugin>ethercat_driver/EthercatDriver</plugin>
+      <param name="master_id">0</param>
+      <param name="control_frequency">100</param> -->
+  </hardware>
+  <joint name="wheel_left_joint">
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+      <command_interface name="velocity"/>
+<!--       <state_interface name="position"/>
+      <state_interface name="velocity"/>
+      <state_interface name="effort"/>
+      <command_interface name="velocity"/>
+      <command_interface name="reset_fault"/>
+      <ec_module name="Maxon">
+        <plugin>ethercat_generic_plugins/EcCiA402Drive</plugin>
+        <param name="alias">0</param>
+        <param name="position">0</param>
+        <param name="mode_of_operation">9</param>
+        <param name="slave_config">$(find ethercat_diff_drive)/config/maxon_epos4_config.yaml</param>
+      </ec_module> -->
+  </joint>
+  <joint name="wheel_right_joint">
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+      <command_interface name="velocity"/>
+<!--       <state_interface name="position"/>
+      <state_interface name="effort"/>
+      <command_interface name="velocity"/>
+      <command_interface name="reset_fault"/>
+      <ec_module name="Maxon">
+        <plugin>ethercat_generic_plugins/EcCiA402Drive</plugin>
+        <param name="alias">0</param>
+        <param name="position">1</param>
+        <param name="mode_of_operation">9</param>
+        <param name="slave_config">$(find ethercat_diff_drive)/config/maxon_epos4_config.yaml</param>
+      </ec_module> -->
+  </joint>
+</ros2_control>
+
+</robot>
