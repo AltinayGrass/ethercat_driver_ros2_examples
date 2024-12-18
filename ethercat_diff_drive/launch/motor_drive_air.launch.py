@@ -39,7 +39,7 @@ def generate_launch_description():
     declared_arguments.append(
         DeclareLaunchArgument(
             'description_file',
-            default_value='motor_drive_base_urdf.xacro',
+            default_value='air_urdf.xacro',
             description='URDF/XACRO description file with the axis.',
         )
     )

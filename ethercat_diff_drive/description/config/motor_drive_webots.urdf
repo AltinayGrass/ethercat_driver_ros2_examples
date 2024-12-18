@@ -4,7 +4,7 @@
         <device reference="hokuyo" type="Lidar">
             <ros>
                 <enabled>true</enabled>
-                <updateRate>10</updateRate>
+                <updateRate>20</updateRate>
                 <topicName>/scan</topicName>
                 <alwaysOn>true</alwaysOn>
                 <frameName>hokuyo</frameName>
@@ -53,7 +53,31 @@
           <param name="slave_config">$(find ethercat_diff_drive)/config/maxon_epos4_config.yaml</param>
         </ec_module>         -->
 
-    </joint>
+  </joint>
+ <joint name="caster_front_right_1_joint">
+    <state_interface name="position"/>
+  </joint>
+  <joint name="caster_front_left_1_joint">
+    <state_interface name="position"/>
+  </joint>
+  <joint name="caster_back_right_1_joint">
+    <state_interface name="position"/>
+  </joint>
+  <joint name="caster_back_left_1_joint">
+    <state_interface name="position"/>
+  </joint>
+  <joint name="caster_front_right_2_joint">
+    <state_interface name="position"/>
+  </joint>
+  <joint name="caster_front_left_2_joint">
+    <state_interface name="position"/>
+  </joint>
+  <joint name="caster_back_right_2_joint">
+    <state_interface name="position"/>
+  </joint>
+  <joint name="caster_back_left_2_joint">
+    <state_interface name="position"/>
+  </joint>
 </ros2_control>
 
 </robot>

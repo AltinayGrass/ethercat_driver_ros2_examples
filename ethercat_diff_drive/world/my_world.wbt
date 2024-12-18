@@ -13,7 +13,7 @@ WorldInfo {
     "Simple diff_drive simulation that can be controlled with ROS2."
   ]
   title "ROS2 simulation of the diff_drive robot"
-  basicTimeStep 10
+  basicTimeStep 20
 }
 Viewpoint {
   orientation -0.3259129066293485 0.6045847308938715 0.7268136490617071 1.2809214799066853
@@ -59,7 +59,7 @@ TiagoBase {
   supervisor TRUE
   lidarSlot [
     HokuyoUrg04lxug01 {
-      translation 0.02 0 0
+      translation 0.07 0 0
       name "hokuyo"
     }
   ]

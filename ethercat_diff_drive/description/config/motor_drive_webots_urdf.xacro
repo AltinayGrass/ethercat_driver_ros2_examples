@@ -54,7 +54,7 @@
 </material>
   
 <!-- PROPERTIES -->
-<xacro:property name="base_laser_x" value="0.202"/>
+<xacro:property name="base_laser_x" value="0.272"/>
 <xacro:property name="base_laser_y" value="0.0"/>
 <xacro:property name="base_laser_z" value="-0.004"/>
 <xacro:property name="deg_to_rad" value="0.01745329251994329577" />
@@ -284,18 +284,18 @@
       </collision>
     </link>
 
-    <joint name="caster_${side}_1_joint" type="fixed">
+    <joint name="caster_${side}_1_joint" type="continuous">
       <parent link="${parent}"/>
       <child link="caster_${side}_1_link"/>
       <origin xyz="${offset_x + separation_x / 2} ${offset_y - separation_y / 2} ${offset_z}" rpy="0 0 0"/>
       <axis xyz="0 0 1"/>
     </joint>
 
-    <joint name="caster_${side}_2_joint" type="fixed">
+    <joint name="caster_${side}_2_joint" type="continuous">
       <parent link="caster_${side}_1_link"/>
       <child link="caster_${side}_2_link"/>
       <origin xyz="-0.016 0.0000 -0.040" rpy="${-90.0 * deg_to_rad} 0 0"/>
-      <axis xyz="0 1 0"/>
+      <axis xyz="0 0 1"/>
     </joint>
 
   </xacro:macro>
@@ -345,7 +345,7 @@
       <device reference="hokuyo" type="Lidar">
           <ros>
               <enabled>true</enabled>
-              <updateRate>10</updateRate>
+              <updateRate>20</updateRate>
               <topicName>/scan</topicName>
               <alwaysOn>true</alwaysOn>
               <frameName>hokuyo</frameName>
@@ -393,6 +393,30 @@
         <param name="mode_of_operation">9</param>
         <param name="slave_config">$(find ethercat_diff_drive)/config/maxon_epos4_config.yaml</param>
       </ec_module> -->
+  </joint>
+  <joint name="caster_front_right_1_joint">
+    <state_interface name="position"/>
+  </joint>
+  <joint name="caster_front_left_1_joint">
+    <state_interface name="position"/>
+  </joint>
+  <joint name="caster_back_right_1_joint">
+    <state_interface name="position"/>
+  </joint>
+  <joint name="caster_back_left_1_joint">
+    <state_interface name="position"/>
+  </joint>
+  <joint name="caster_front_right_2_joint">
+    <state_interface name="position"/>
+  </joint>
+  <joint name="caster_front_left_2_joint">
+    <state_interface name="position"/>
+  </joint>
+  <joint name="caster_back_right_2_joint">
+    <state_interface name="position"/>
+  </joint>
+  <joint name="caster_back_left_2_joint">
+    <state_interface name="position"/>
   </joint>
 </ros2_control>
 

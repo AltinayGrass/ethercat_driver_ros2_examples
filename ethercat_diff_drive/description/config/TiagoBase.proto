@@ -404,7 +404,7 @@ PROTO TiagoBase [
         }
         device [
             PositionSensor {
-            name "CASTER_WHEEL_FRONT_RIGHT_JOINT"
+            name "caster_front_right_1_joint"
             resolution -1
             }
         ]
@@ -419,7 +419,7 @@ PROTO TiagoBase [
               }
               device [
                 PositionSensor {
-                name "SMALL_WHEEL_JOINT_0"
+                name "caster_front_right_2_joint"
                 resolution -1
                 }
               ]
@@ -491,8 +491,8 @@ PROTO TiagoBase [
           suspensionAxis 0 0 1
         }
         device [
-            PositionSensor {
-            name "caster_front_left_1_joint_sensor"
+          PositionSensor {
+            name "caster_front_left_1_joint"
             resolution -1
             }
         ]
@@ -507,7 +507,7 @@ PROTO TiagoBase [
               }
               device [
                 PositionSensor {
-                name "SMALL_WHEEL_JOINT_0"
+                name "caster_front_left_2_joint"
                 resolution -1
                 }
               ]
@@ -580,7 +580,7 @@ PROTO TiagoBase [
         }
         device [
             PositionSensor {
-            name "CASTER_WHEEL_BACK_RIGHT_JOINT"
+            name "caster_back_right_1_joint"
             resolution -1
             }
         ]
@@ -595,7 +595,7 @@ PROTO TiagoBase [
               }
               device [
                 PositionSensor {
-                name "SMALL_WHEEL_JOINT_2"
+                name "caster_back_right_2_joint"
                 resolution -1
                 }
               ]
@@ -668,7 +668,7 @@ PROTO TiagoBase [
         }
         device [
             PositionSensor {
-            name "CASTER_WHEEL_BACK_LEFT_JOINT"
+            name "caster_back_left_1_joint"
             resolution -1
             }
         ]
@@ -683,7 +683,7 @@ PROTO TiagoBase [
               }
               device [
                 PositionSensor {
-                name "SMALL_WHEEL_JOINT_1"
+                name "caster_back_left_2_joint"
                 resolution -1
                 }
               ]

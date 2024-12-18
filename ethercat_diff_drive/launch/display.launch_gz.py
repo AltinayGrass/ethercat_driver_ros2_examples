@@ -7,10 +7,13 @@ import os
 
 def generate_launch_description():
     pkg_share = FindPackageShare(package='ethercat_diff_drive').find('ethercat_diff_drive')
-    default_model_path = os.path.join(pkg_share, 'description/config/motor_drive.urdf_gz.xacro')
+    default_model_path = os.path.join(pkg_share, 'description/config/motor_drive_webots_urdf_gz.urdf')
     default_rviz_config_path = os.path.join(pkg_share, 'rviz/urdf_config.rviz')
     ros_gz_sim = get_package_share_directory('ros_gz_sim')
     
+    use_slam_toolbox = LaunchConfiguration('slam_toolbox', default=False)
+    use_sim_time = LaunchConfiguration('use_sim_time', default=False)
+
     world = PathJoinSubstitution(
         [
             FindPackageShare("ethercat_diff_drive"),
@@ -18,6 +21,11 @@ def generate_launch_description():
             "my_world.sdf",
         ]
     )
+
+    sdf_file = os.path.join(pkg_share,'world', 'motor_drive' , 'model.sdf')
+    with open(sdf_file, 'r') as infp:
+        robot_desc = infp.read()
+
     gzserver_cmd = launch.actions.IncludeLaunchDescription(
         launch.launch_description_sources.PythonLaunchDescriptionSource(
             os.path.join(ros_gz_sim, 'launch', 'gz_sim.launch.py')
@@ -36,7 +44,7 @@ def generate_launch_description():
         [
             FindPackageShare("ethercat_diff_drive"),
             "config",
-            "controllers.yaml",
+            "controllers_webots.yaml",
         ]
         )
 
@@ -61,7 +69,10 @@ def generate_launch_description():
         package='robot_state_publisher',
         executable='robot_state_publisher',
         output="both",
-        parameters=[{'robot_description': Command(['xacro ', LaunchConfiguration('model')])},{'use_sim_time': LaunchConfiguration('use_sim_time')}],
+        parameters=[
+            # {'robot_description': robot_desc},
+            {'robot_description': Command(['xacro ', default_model_path])},
+            {'use_sim_time': LaunchConfiguration('use_sim_time')}],
         )
 
     joint_state_publisher_node = launch_ros.actions.Node(
@@ -107,10 +118,25 @@ def generate_launch_description():
     robot_control_node = launch_ros.actions.Node(
         package="controller_manager",
         executable="ros2_control_node",
-        parameters=[{'use_sim_time': LaunchConfiguration('use_sim_time')},{'robot_description': Command(['xacro ', LaunchConfiguration('model')])}, robot_controllers],
+        parameters=[{'use_sim_time': LaunchConfiguration('use_sim_time')},
+                    {'robot_description': Command(['xacro ', default_model_path])}, 
+                    robot_controllers],
         output="both",
         )
     
+    # Navigation
+    toolbox_params = os.path.join(pkg_share, 'config', 'slam_toolbox_params.yaml')
+    slam_toolbox = launch_ros.actions.Node(
+        parameters=[toolbox_params,
+                    {'use_sim_time':  use_sim_time}],
+        package='slam_toolbox',
+        executable='async_slam_toolbox_node',
+        name='slam_toolbox',
+        output='screen',
+        condition=launch.conditions.IfCondition(use_slam_toolbox)
+    )
+ 
+
     rviz_node = launch_ros.actions.Node(
         package='rviz2',
         executable='rviz2',
@@ -132,11 +158,12 @@ def generate_launch_description():
         declare_y_position_cmd,
         gzserver_cmd,        
         gzclient_cmd,
+        start_gazebo_ros_bridge_cmd,
         robot_control_node,
         diff_drive_controller_node,
         joint_state_publisher_node,
         robot_state_publisher_node,
-        # spawn_entity,
-        start_gazebo_ros_bridge_cmd,
+        slam_toolbox,
+        #spawn_entity,
         #rviz_node
     ])
