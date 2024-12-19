@@ -14,7 +14,11 @@
   </material>
 
   <material name="yellow">
-    <color rgba="1.0, 0.92, 0.016, 1.0"/>
+    <color rgba="1.0 0.92 0.016 1"/>
+  </material>
+
+  <material name="grey">
+    <color rgba="0.7 0.7 0.7 1.0"/>
   </material>
 
 
@@ -79,7 +83,7 @@
       <geometry>
         <box size="${base_panel_length} ${base_width} ${base_tick}"/>
       </geometry>
-      <material name="white"/>
+       <material name="grey"/>
     </visual>
 
     <visual>
@@ -87,7 +91,7 @@
       <geometry>
         <box size="${base_panel_length} ${base_width} ${base_tick}"/>
       </geometry>
-      <material name="white"/>
+       <material name="grey"/>
     </visual>
 
     <visual>
@@ -95,7 +99,7 @@
       <geometry>
         <box size="${base_panel_length} ${base_panel_width} ${base_tick}"/>
       </geometry>
-      <material name="white"/>
+       <material name="grey"/>
     </visual>
 
     <visual>
@@ -103,7 +107,7 @@
       <geometry>
         <box size="${base_panel_length} ${base_width} ${base_tick}"/>
       </geometry>
-      <material name="white"/>
+       <material name="grey"/>
     </visual>
 
     <visual>
@@ -111,7 +115,7 @@
       <geometry>
         <box size="${base_panel_length} ${base_width} ${base_tick}"/>
       </geometry>
-      <material name="white"/>
+       <material name="grey"/>
     </visual>
 
     <collision>
@@ -135,7 +139,7 @@
   
     </visual>
       <collision>
-      <origin xyz="0.0 0.0 ${wheel_zoff+base_height+battery_height/2.0}" rpy="0 0 0"/>
+      <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
       <geometry>
         <box size="${battery_length} ${battery_width} ${battery_height}"/>
       </geometry>
@@ -198,7 +202,7 @@
       </geometry>
     </collision>
 
-    <xacro:sphere_inertia m="5" r="${(base_height/2+wheel_zoff)}"/>
+    <xacro:sphere_inertia m="0.5" r="${(base_height/2+wheel_zoff)}"/>
   </link>
 
   <joint name="front_left_caster_joint" type="fixed">
@@ -222,7 +226,7 @@
       </geometry>
     </collision>
 
-    <xacro:sphere_inertia m="5" r="${(base_height/2+wheel_zoff)}"/>
+    <xacro:sphere_inertia m="0.5" r="${(base_height/2+wheel_zoff)}"/>
   </link>
 
   <joint name="front_right_caster_joint" type="fixed">
@@ -246,7 +250,7 @@
       </geometry>
     </collision>
 
-    <xacro:sphere_inertia m="5" r="${(base_height/2+wheel_zoff)}"/>
+    <xacro:sphere_inertia m="0.5" r="${(base_height/2+wheel_zoff)}"/>
   </link>
 
   <joint name="rear_left_caster_joint" type="fixed">
@@ -270,7 +274,7 @@
       </geometry>
     </collision>
 
-    <xacro:sphere_inertia m="5" r="${(base_height/2+wheel_zoff)}"/>
+    <xacro:sphere_inertia m="0.5" r="${(base_height/2+wheel_zoff)}"/>
   </link>
 
   <joint name="rear_right_caster_joint" type="fixed">
@@ -289,11 +293,11 @@
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <cylinder radius="0.0508" length="0.055"/>
+        <cylinder radius="0.0508" length="0.18"/>
       </geometry>
     </collision>
     <visual>
-      <origin xyz="0 0 0" rpy="3.1415 0 0"/>
+      <origin xyz="0 0 0" rpy="3.1415 0 -1.5708"/>
       <geometry>
         <!-- <cylinder radius="0.0508" length="0.055"/> -->
         <mesh filename="package://ethercat_diff_drive/description/config/meshes/s300.obj" scale="0.001 0.001 0.001"/>
@@ -312,7 +316,7 @@
   <joint name="laser_joint_0" type="fixed">
     <parent link="base_link"/>
     <child link="laser_link_0"/>
-    <origin xyz="0.4 -0.28 0.18" rpy="0 0 -2.356"/>
+    <origin xyz="0.4 -0.28 0.18" rpy="0 0 -0.7854"/>
   </joint>
 
     <!-- ****************************** LASER 1 *****************************    -->
@@ -325,11 +329,11 @@
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <cylinder radius="0.0508" length="0.055"/>
+        <cylinder radius="0.0508" length="0.18"/>
       </geometry>
     </collision>
     <visual>
-      <origin xyz="0 0 0" rpy="3.1415 0 0"/>
+      <origin xyz="0 0 0" rpy="3.1415 0 -1.5708"/>
       <geometry>
         <!-- <cylinder radius="0.0508" length="0.055"/> -->
         <mesh filename="package://ethercat_diff_drive/description/config/meshes/s300.obj" scale="0.001 0.001 0.001"/>
@@ -348,7 +352,7 @@
   <joint name="laser_joint_1" type="fixed">
     <parent link="base_link"/>
     <child link="laser_link_1"/>
-    <origin xyz="-0.4 0.28 0.18" rpy="0 0 0.7854"/>
+    <origin xyz="-0.4 0.28 0.18" rpy="0 0 2.3562"/>
   </joint>
    
    
