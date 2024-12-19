@@ -13,6 +13,11 @@
     <color rgba="1 1 1 1"/>
   </material>
 
+  <material name="yellow">
+    <color rgba="1.0, 0.92, 0.016, 1.0"/>
+  </material>
+
+
     <!-- Define some commonly used intertial properties  -->
   <xacro:macro name="box_inertia" params="m w h d">
     <inertial>
@@ -288,24 +293,26 @@
       </geometry>
     </collision>
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="0 0 0" rpy="3.1415 0 0"/>
       <geometry>
-        <cylinder radius="0.0508" length="0.055"/>
+        <!-- <cylinder radius="0.0508" length="0.055"/> -->
+        <mesh filename="package://ethercat_diff_drive/description/config/meshes/s300.obj" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="lidar_visual">
+        <material name="yellow"/>
+      <!-- <material name="lidar_visual">
         <color rgba="0.8 0 0 1"/>
         <ambient>0.0 0.0 0.0 1.0</ambient>
         <diffuse>0.0 0.0 0.0 1.0</diffuse>
         <specular>0.0 0.0 0.0 1.0</specular>
         <emissive>0.0 0.0 0.0 1.0</emissive>
-      </material>
+      </material> -->
     </visual>
   </link>
   
   <joint name="laser_joint_0" type="fixed">
     <parent link="base_link"/>
     <child link="laser_link_0"/>
-    <origin xyz="0.4 -0.28 0.18" rpy="0 0 -0.7854"/>
+    <origin xyz="0.4 -0.28 0.18" rpy="0 0 -2.356"/>
   </joint>
 
     <!-- ****************************** LASER 1 *****************************    -->
@@ -322,24 +329,26 @@
       </geometry>
     </collision>
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="0 0 0" rpy="3.1415 0 0"/>
       <geometry>
-        <cylinder radius="0.0508" length="0.055"/>
+        <!-- <cylinder radius="0.0508" length="0.055"/> -->
+        <mesh filename="package://ethercat_diff_drive/description/config/meshes/s300.obj" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="lidar_visual">
+      <material name="yellow"/>
+      <!-- <material name="lidar_visual">
         <color rgba="0.8 0 0 1"/>
         <ambient>0.0 0.0 0.0 1.0</ambient>
         <diffuse>0.0 0.0 0.0 1.0</diffuse>
         <specular>0.0 0.0 0.0 1.0</specular>
         <emissive>0.0 0.0 0.0 1.0</emissive>
-      </material>
+      </material> -->
     </visual>
   </link>
   
   <joint name="laser_joint_1" type="fixed">
     <parent link="base_link"/>
     <child link="laser_link_1"/>
-    <origin xyz="-0.4 0.28 0.18" rpy="0 0 2.3562"/>
+    <origin xyz="-0.4 0.28 0.18" rpy="0 0 0.7854"/>
   </joint>
    
    
