@@ -75,7 +75,7 @@
       <geometry>
         <box size="${base_panel_length} ${base_panel_width} ${base_tick}"/>
       </geometry>
-      <material name="white"/>
+      <material name="grey"/>
     </visual>
 
     <visual>
