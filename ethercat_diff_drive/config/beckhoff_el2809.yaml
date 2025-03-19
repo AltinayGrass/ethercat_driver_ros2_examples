@@ -29,16 +29,16 @@ rpdo:  # RxPDO
       - {index: 0x7070, sub_index: 0x01, type: bool, mask: 128, command_interface: do.8}
   - index: 0x1608
     channels:
-      - {index: 0x7080, sub_index: 0x01, type: bool, mask: 256, command_interface: do.9}
+      - {index: 0x7080, sub_index: 0x01, type: bool, mask: 1, command_interface: do.9}
   - index: 0x1609
     channels:
-      - {index: 0x7090, sub_index: 0x01, type: bool, mask: 512, command_interface: do.10}
+      - {index: 0x7090, sub_index: 0x01, type: bool, mask: 2, command_interface: do.10}
   - index: 0x160a
     channels:
-      - {index: 0x70a0, sub_index: 0x01, type: bool, mask: 1024, command_interface: do.11}
+      - {index: 0x70a0, sub_index: 0x01, type: bool, mask: 4, command_interface: do.11}
   - index: 0x160b
     channels:
-      - {index: 0x70b0, sub_index: 0x01, type: bool, mask: 2048, command_interface: do.12}
+      - {index: 0x70b0, sub_index: 0x01, type: bool, mask: 8, command_interface: do.12}
   - index: 0x160c
     channels:
       - {index: 0x70c0, sub_index: 0x01, type: bool}
