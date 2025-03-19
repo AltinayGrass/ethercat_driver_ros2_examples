@@ -7,7 +7,37 @@ controller_manager:
 
     diff_drive_controller:
       type: diff_drive_controller/DiffDriveController
+    
+    gpio_controller:
+      type: gpio_controllers/GpioCommandController
 
+gpio_controller:
+  ros__parameters:
+    type: gpio_controllers/GpioCommandController
+    gpios:
+      - gpio0
+    command_interfaces:
+      gpio0:
+        - interfaces:
+          - do.1
+          - do.2
+          - do.3
+          - do.4
+          - do.9
+          - do.10
+          - do.11
+          - do.12
+    state_interfaces:
+      gpio0:
+        - interfaces:
+          - do.1
+          - do.2
+          - do.3
+          - do.4
+          - do.9
+          - do.10
+          - do.11
+          - do.12
 
 diff_drive_controller:
   ros__parameters:

@@ -1,0 +1,42 @@
+# Configuration file for Beckhoff EL7221-9015 drive
+vendor_id: 0x00000002
+product_id: 0x1C353052
+assign_activate: 0x0700  # DC Synch register
+auto_fault_reset: true  # true = automatic fault reset, false = fault reset on rising edge command interface "reset_fault"
+sdo:  # sdo data to be transferred at drive startup
+  - {index: 0x2002, sub_index: 0x19, type: int32, value: 24000} # Setup for 24V bus voltage
+  - {index: 0x2002, sub_index: 0x14, type: int32, value: 150}
+  - {index: 0x2002, sub_index: 0x15, type: int32, value: 244}
+  - {index: 0x2002, sub_index: 0x13, type: int32, value: 243}
+  - {index: 0x2002, sub_index: 0x12, type: int16, value: 5}
+  - {index: 0x6080, sub_index: 0x0, type: int32, value: 824}
+  - {index: 0x2003, sub_index: 0x15, type: int16, value: 270}
+  - {index: 0x2003, sub_index: 0x2D, type: int16, value: 752}
+  - {index: 0x2003, sub_index: 0x18, type: int32, value: 467}
+  - {index: 0x2003, sub_index: 0x19, type: int16, value: 21}
+  - {index: 0x2003, sub_index: 0x16, type: int32, value: 169}
+  - {index: 0x2003, sub_index: 0x11, type: int32, value: 44700}
+  - {index: 0x2003, sub_index: 0x13, type: int8, value: 4}
+  - {index: 0x6075, sub_index: 0x0, type: int32, value: 8000}
+
+rpdo:  # RxPDO = receive PDO Mapping
+  - index: 0x1600
+    channels:
+      - {index: 0x6040, sub_index: 0, type: uint16, default: 0}  # Control word
+  - index: 0x1601
+    channels:
+      - {index: 0x60ff, sub_index: 0, type: int32, command_interface: velocity,default: .nan}  # Target velocity
+  - index: 0x1608
+    channels:
+      - {index: 0x6060, sub_index: 0, type: int8, default: 9}  # Mode of operation
+
+tpdo:  # TxPDO = transmit PDO Mapping
+  - index: 0x1a00
+    channels:
+      - {index: 0x6041, sub_index: 0, type: uint16}  # Status word
+  - index: 0x1a01
+    channels:      
+      - {index: 0x6064, sub_index: 0, type: int32, state_interface: position}  # Position actual value
+  - index: 0x1a02
+    channels:      
+      - {index: 0x606c, sub_index: 0, type: int32, state_interface: velocity}  # Velocity actual value

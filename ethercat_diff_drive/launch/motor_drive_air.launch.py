@@ -15,9 +15,10 @@
 import os
 from launch import LaunchDescription
 from launch.substitutions import Command, FindExecutable, PathJoinSubstitution, LaunchConfiguration, PythonExpression
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, RegisterEventHandler
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.conditions import IfCondition, UnlessCondition
+from launch.event_handlers import OnProcessExit
 
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
@@ -98,6 +99,18 @@ def generate_launch_description():
         arguments=["diff_drive_controller", "-c", "/controller_manager"],
     )
 
+    gpio_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["gpio_controller", "-c", "/controller_manager"],
+    )
+
+    delay_gpio_after_diff_drive_controller_spawner = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=diff_drive_controller_spawner,
+            on_exit=[gpio_controller_spawner],
+        )
+    )
     # velocity_controller_spawner = Node(
     #     package="controller_manager",
     #     executable="spawner",
@@ -118,6 +131,7 @@ def generate_launch_description():
         robot_state_pub_node,
         joint_state_broadcaster_spawner,
         diff_drive_controller_spawner,
+        delay_gpio_after_diff_drive_controller_spawner,
         # velocity_controller_spawner,
         # effort_controller_spawner,
     ]
