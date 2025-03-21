@@ -53,4 +53,4 @@ rpdo:  # RxPDO
       - {index: 0x70f0, sub_index: 0x01, type: bool}   
 sm:  # Sync Manager
   - {index: 0, type: output, pdo: rpdo, watchdog: enable}
-  - {index: 1, type: output, pdo: rpdo, watchdog: enable}
+  - {index: 1, type: output, pdo: rpdo+8, watchdog: enable}

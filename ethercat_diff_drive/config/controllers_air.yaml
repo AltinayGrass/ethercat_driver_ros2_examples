@@ -16,6 +16,7 @@ gpio_controller:
     type: gpio_controllers/GpioCommandController
     gpios:
       - gpio0
+      - gpio1
     command_interfaces:
       gpio0:
         - interfaces:
@@ -38,6 +39,16 @@ gpio_controller:
           - do.10
           - do.11
           - do.12
+      gpio1:
+        - interfaces:
+          - di.1
+          - di.2
+          - di.3
+          - di.4
+          - di.9
+          - di.10
+          - di.11
+          - di.12
 
 diff_drive_controller:
   ros__parameters:
@@ -57,8 +68,8 @@ diff_drive_controller:
     wheel_radius: 0.1
 
     wheel_separation_multiplier: 1.0
-    left_wheel_radius_multiplier: 0.0275 # maxon with out gear 
-    right_wheel_radius_multiplier: -0.0275 # maxon with out gear 
+    left_wheel_radius_multiplier: 1.0 # 0.0275 # maxon with out gear 
+    right_wheel_radius_multiplier: 1.0 # -0.0275 # maxon with out gear 
 
     odom_frame_id: odom
     base_frame_id: base_link
