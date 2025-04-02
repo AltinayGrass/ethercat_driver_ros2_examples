@@ -11,7 +11,7 @@ rpdo:  # RxPDO = receive PDO Mapping
     channels:
       - {index: 0x6040, sub_index: 0, type: uint16, default: 0}  # Control word
       - {index: 0x607a, sub_index: 0, type: int32,  default: 0}  # Target position
-      - {index: 0x60ff, sub_index: 0, type: int32, command_interface: velocity,default: .nan}  # Target velocity
+      - {index: 0x60ff, sub_index: 0, type: int32, command_interface: velocity,default: 0}  # Target velocity
       - {index: 0x6071, sub_index: 0, type: int16, default: 0}  # Target torque
       - {index: 0x60b0, sub_index: 0, type: int32, default: 0}  # Offset position
       - {index: 0x60b1, sub_index: 0, type: int32, default: 0}  # Offset velocity

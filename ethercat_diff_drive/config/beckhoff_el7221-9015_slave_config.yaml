@@ -9,7 +9,7 @@ sdo:  # sdo data to be transferred at drive startup
   - {index: 0x2002, sub_index: 0x15, type: uint32, value: 244}
   - {index: 0x2002, sub_index: 0x13, type: uint16, value: 243}
   - {index: 0x2002, sub_index: 0x12, type: uint16, value: 5}
-  - {index: 0x6080, sub_index: 0x00, type: uint32, value: 824}
+  - {index: 0x6080, sub_index: 0x00, type: uint32, value: 1400}
   - {index: 0x2003, sub_index: 0x15, type: int16, value: 270}
   - {index: 0x2003, sub_index: 0x2D, type: uint16, value: 752}
   - {index: 0x2003, sub_index: 0x18, type: uint32, value: 467}
@@ -20,14 +20,15 @@ sdo:  # sdo data to be transferred at drive startup
   - {index: 0x6075, sub_index: 0x00, type: uint32, value: 8000}
   - {index: 0x6060, sub_index: 0, type: uint8, value: 9}  # Mode of operation
 
-
 rpdo:  # RxPDO = receive PDO Mapping
   - index: 0x1600
     channels:
       - {index: 0x6040, sub_index: 0, type: uint16, default: 0}  # Control word
   - index: 0x1601
     channels:
-      - {index: 0x60ff, sub_index: 0, type: int32, command_interface: velocity, factor: 235.724, default: .nan}  # Target velocity
+#      - {index: 0x60ff, sub_index: 0, type: int32, command_interface: velocity, factor: 2.503290804e6, default: 0}  # Target velocity
+
+     - {index: 0x60ff, sub_index: 0, type: int32, command_interface: velocity, factor: 976837, default: 0}  # Target velocity
   # - index: 0x1608
   #   channels:
       # - {index: 0x6060, sub_index: 0, type: int8, default: 9}  # Mode of operation
@@ -38,7 +39,9 @@ tpdo:  # TxPDO = transmit PDO Mapping
       - {index: 0x6041, sub_index: 0, type: uint16}  # Status word
   - index: 0x1a01
     channels:      
-      - {index: 0x6064, sub_index: 0, type: uint32, state_interface: position, factor: 1.5535e-8}  # Position actual value
+#      - {index: 0x6064, sub_index: 0, type: uint32, state_interface: position, factor: 970.972242686e-9}  # Position actual value
+
+      - {index: 0x6064, sub_index: 0, type: uint32, state_interface: position, factor: 131.077459899e-9}  # Position actual value (2*PI*21/60x16/encoder_reso)
   # - index: 0x1a02
   #   channels:      
   #     - {index: 0x606c, sub_index: 0, type: int32, state_interface: velocity, factor: 0.00424}  # Velocity actual value

@@ -1,6 +1,7 @@
 controller_manager:
   ros__parameters:
-    update_rate: 100  # Hz
+    update_rate: 500  # Hz
+    thread_priority: 80
 
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
@@ -68,7 +69,7 @@ diff_drive_controller:
     wheel_radius: 0.1
 
     wheel_separation_multiplier: 1.0
-    left_wheel_radius_multiplier: 1.0 # 0.0275 # maxon with out gear 
+    left_wheel_radius_multiplier: -1.0 # 0.0275 # maxon with out gear 
     right_wheel_radius_multiplier: 1.0 # -0.0275 # maxon with out gear 
 
     odom_frame_id: odom
@@ -79,6 +80,7 @@ diff_drive_controller:
     position_feedback: true
     open_loop: false
     enable_odom_tf: true
+    # use_stamped_vel: false
 
     cmd_vel_timeout: 0.5 # seconds
     publish_limited_velocity: true
@@ -87,19 +89,19 @@ diff_drive_controller:
     linear.x.has_velocity_limits: true
     linear.x.has_acceleration_limits: true
     linear.x.has_jerk_limits: false
-    linear.x.max_velocity: 2.0
-    linear.x.min_velocity: -2.0
+    linear.x.max_velocity: 0.5
+    linear.x.min_velocity: -0.5
     linear.x.max_acceleration: 1.0
     linear.x.min_acceleration: -1.0
-    linear.x.max_jerk: 0.0
-    linear.x.min_jerk: 0.0
+    linear.x.max_jerk: 2.5
+    linear.x.min_jerk: -2.5
 
     angular.z.has_velocity_limits: true
     angular.z.has_acceleration_limits: true
     angular.z.has_jerk_limits: false
-    angular.z.max_velocity: 2.0
-    angular.z.min_velocity: -2.0
-    angular.z.max_acceleration: 8.0
-    angular.z.min_acceleration: -8.0
-    angular.z.max_jerk: 0.0
-    angular.z.min_jerk: 0.0
+    angular.z.max_velocity: 1.0
+    angular.z.min_velocity: -1.0
+    angular.z.max_acceleration: 2.0
+    angular.z.min_acceleration: -2.0
+    angular.z.max_jerk: 2.5
+    angular.z.min_jerk: -2.5

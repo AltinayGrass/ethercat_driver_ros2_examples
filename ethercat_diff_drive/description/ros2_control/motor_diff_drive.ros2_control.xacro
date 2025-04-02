@@ -33,6 +33,22 @@
           <param name="slave_config">$(find ethercat_diff_drive)/config/beckhoff_el2809.yaml</param>
         </ec_module>
       </gpio>
+        <gpio name="gpio1">
+        <state_interface name="di.1"/>
+        <state_interface name="di.3"/>
+        <state_interface name="di.4"/>
+        <state_interface name="di.2"/>
+        <state_interface name="di.9"/>
+        <state_interface name="di.10"/>
+        <state_interface name="di.11"/>
+        <state_interface name="di.12"/>
+        <ec_module name="EL1809">
+          <plugin>ethercat_generic_plugins/GenericEcSlave</plugin>
+          <param name="alias">0</param>
+          <param name="position">5</param>
+          <param name="slave_config">$(find ethercat_diff_drive)/config/beckhoff_el1809.yaml</param>
+        </ec_module>
+      </gpio>
       <joint name="joint_1">
         <state_interface name="position"/>
         <state_interface name="velocity"/>
