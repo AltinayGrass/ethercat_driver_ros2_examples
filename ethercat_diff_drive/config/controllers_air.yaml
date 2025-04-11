@@ -14,7 +14,6 @@ controller_manager:
 
 gpio_controller:
   ros__parameters:
-    type: gpio_controllers/GpioCommandController
     gpios:
       - gpio0
       - gpio1
@@ -30,16 +29,6 @@ gpio_controller:
           - do.11
           - do.12
     state_interfaces:
-      gpio0:
-        - interfaces:
-          - do.1
-          - do.2
-          - do.3
-          - do.4
-          - do.9
-          - do.10
-          - do.11
-          - do.12
       gpio1:
         - interfaces:
           - di.1

@@ -13,6 +13,9 @@
 # limitations under the License.
 
 import os
+
+from ament_index_python.packages import get_package_share_directory
+
 from launch import LaunchDescription
 from launch.substitutions import Command, FindExecutable, PathJoinSubstitution, LaunchConfiguration, PythonExpression
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, RegisterEventHandler
@@ -23,13 +26,12 @@ from launch.event_handlers import OnProcessExit
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
+from launch.substitutions import ThisLaunchFileDir
 
 def generate_launch_description():
 
     pkg_share = FindPackageShare(package='ethercat_diff_drive').find('ethercat_diff_drive')
     use_sim_time = LaunchConfiguration('use_sim_time', default='False')
-
-    use_slam_toolbox = LaunchConfiguration('slam_toolbox', default='False')
 
     declare_use_sim_time_cmd = DeclareLaunchArgument(
         name='use_sim_time',
@@ -85,7 +87,7 @@ def generate_launch_description():
         package="robot_state_publisher",
         executable="robot_state_publisher",
         output="both",
-        parameters=[{'use_sim_time': use_sim_time},robot_description],
+        parameters=[{'use_sim_time': use_sim_time}, robot_description],
     )
 
     joint_state_broadcaster_spawner = Node(
@@ -113,47 +115,58 @@ def generate_launch_description():
         )
     )
 
-    # Navigation
-    toolbox_params = os.path.join(pkg_share, 'config', 'slam_toolbox_params.yaml')
-    slam_toolbox = Node(
-        parameters=[toolbox_params,
-                    {'use_sim_time':  use_sim_time}],
-        package='slam_toolbox',
-        executable='async_slam_toolbox_node',
-        name='slam_toolbox',
-        output='screen',
-        condition=IfCondition(use_slam_toolbox)
-    )
     light_control=Node(
         package='light_control',
         executable='light_control',
         output='screen'
     )
-    # velocity_controller_spawner = Node(
-    #     package="controller_manager",
-    #     executable="spawner",
-    #     arguments=["velocity_controller", "-c", "/controller_manager"],
-    # )
 
-    # effort_controller_spawner = Node(
-    #     package="controller_manager",
-    #     executable="spawner",
-    #     arguments=["effort_controller", "-c", "/controller_manager"],
-    # )
+    # RTAB-Map Node
+    rtabmap_params = PathJoinSubstitution([
+        pkg_share,
+        'config',
+        'rtabmap_params.yaml'  # Bu dosya birazdan vereceğim
+    ])
+
+    rtabmap_node = Node(
+        package='rtabmap_slam',
+        executable='rtabmap',
+        name='rtabmap',
+        output='screen',
+        parameters=[
+            rtabmap_params
+            ],
+        remappings=[
+            ('rgb/image', '/camera/camera/color/image_raw'),
+            ('depth/image', '/camera/camera/aligned_depth_to_color/image_raw'),
+            ('rgb/camera_info', '/camera/camera/color/camera_info'),
+            ('odom', '/diff_drive_controller/odom')
+        ],
+        arguments=['-d']
+    )
+
+    realsense_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([os.path.join(
+                get_package_share_directory('realsense2_camera'),
+                'launch'),
+                '/rs_launch.py']),
+        launch_arguments={
+            'align_depth.enable':'true',
+            'depth_module.depth_profile':'640x480x30',
+            'rgb_camera.color_profile':'640x480x30',
+            'pointcloud.enable':'true'
+            }.items(),
+        )
 
     nodes = [
-        #start_gazebo_server_cmd,
-        #start_gazebo_client_cmd,
-        #spawn_entity,
         control_node,
         robot_state_pub_node,
         joint_state_broadcaster_spawner,
         diff_drive_controller_spawner,
         delay_gpio_after_diff_drive_controller_spawner,
         light_control,
-        slam_toolbox,
-        # velocity_controller_spawner,
-        # effort_controller_spawner,
+        realsense_launch,
+        rtabmap_node,
     ]
 
     return LaunchDescription(

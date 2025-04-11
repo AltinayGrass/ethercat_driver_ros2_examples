@@ -18,14 +18,14 @@
         <command_interface name="do.10"/>
         <command_interface name="do.11"/>
         <command_interface name="do.12"/>
-        <state_interface name="do.1"/>
+        <!-- <state_interface name="do.1"/>
         <state_interface name="do.2"/>
         <state_interface name="do.3"/>
         <state_interface name="do.4"/>
         <state_interface name="do.9"/>
         <state_interface name="do.10"/>
         <state_interface name="do.11"/>
-        <state_interface name="do.12"/>
+        <state_interface name="do.12"/> -->
         <ec_module name="EL2809">
           <plugin>ethercat_generic_plugins/GenericEcSlave</plugin>
           <param name="alias">0</param>
@@ -37,8 +37,8 @@
         <state_interface name="di.1"/>
         <state_interface name="di.3"/>
         <state_interface name="di.4"/>
-       <state_interface name="di.2"/>
-         <state_interface name="di.9"/>
+        <state_interface name="di.2"/>
+        <state_interface name="di.9"/>
         <state_interface name="di.10"/>
         <state_interface name="di.11"/>
         <state_interface name="di.12"/>

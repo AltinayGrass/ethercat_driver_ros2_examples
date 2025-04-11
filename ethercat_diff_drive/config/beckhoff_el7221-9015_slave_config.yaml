@@ -41,7 +41,7 @@ tpdo:  # TxPDO = transmit PDO Mapping
     channels:      
 #      - {index: 0x6064, sub_index: 0, type: uint32, state_interface: position, factor: 970.972242686e-9}  # Position actual value
 
-      - {index: 0x6064, sub_index: 0, type: uint32, state_interface: position, factor: 131.077459899e-9}  # Position actual value (2*PI*21/60x16/encoder_reso)
+      - {index: 0x6064, sub_index: 0, type: int32, state_interface: position, factor: 131.077459899e-9}  # Position actual value (2*PI*21/60x16/encoder_reso)
   # - index: 0x1a02
   #   channels:      
   #     - {index: 0x606c, sub_index: 0, type: int32, state_interface: velocity, factor: 0.00424}  # Velocity actual value

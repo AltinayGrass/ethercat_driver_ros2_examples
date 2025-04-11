@@ -1,0 +1,17 @@
+rtabmap:
+  ros__parameters:
+    subscribe_depth: true
+    subscribe_rgb: true
+    subscribe_imu: false
+    subscribe_scan: false
+    approx_sync: false
+
+    frame_id: "camera_link"
+    odom_frame_id: "odom"
+
+    Mem/IncrementalMemory: "true"
+    RGBD/LinearUpdate: "0.1"
+    RGBD/AngularUpdate: "0.1"
+    Reg/Strategy: "1"  # ICP
+    Grid/FromDepth: "true"
+    Grid/RangeMax: "5.0"
