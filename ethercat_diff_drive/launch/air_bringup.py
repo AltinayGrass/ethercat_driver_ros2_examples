@@ -38,6 +38,13 @@ def generate_launch_description():
         default_value='false',
         description='Use simulation (Gazebo) clock if true')
 
+    delete_db_arg = DeclareLaunchArgument(
+        'delete_db_on_start',
+        default_value='false',  # Varsayılan olarak veritabanını SİLME
+        description='If true, deletes the RTAB-Map database on startup via the -d flag.'
+    )
+
+
     # Declare arguments
     declared_arguments = []
     declared_arguments.append(
@@ -49,6 +56,7 @@ def generate_launch_description():
     )
 
     declared_arguments.append(declare_use_sim_time_cmd)
+    declared_arguments.append(delete_db_arg)
 
     description_file = LaunchConfiguration('description_file')
 
@@ -127,6 +135,25 @@ def generate_launch_description():
         'config',
         'rtabmap_params.yaml'  # Bu dosya birazdan vereceğim
     ])
+    delete_db = LaunchConfiguration('delete_db_on_start')
+    
+    rtabmap_node_d = Node(
+        package='rtabmap_slam',
+        executable='rtabmap',
+        name='rtabmap',
+        output='screen',
+        parameters=[
+            rtabmap_params
+            ],
+        remappings=[
+            ('rgb/image', '/camera/color/image_raw'),
+            ('depth/image', '/camera/aligned_depth_to_color/image_raw'),
+            ('rgb/camera_info', '/camera/color/camera_info'),
+            ('odom', '/diff_drive_controller/odom')
+        ],
+        arguments=['-d'],
+        condition=IfCondition(delete_db)
+    )
 
     rtabmap_node = Node(
         package='rtabmap_slam',
@@ -137,13 +164,14 @@ def generate_launch_description():
             rtabmap_params
             ],
         remappings=[
-            ('rgb/image', '/camera/camera/color/image_raw'),
-            ('depth/image', '/camera/camera/aligned_depth_to_color/image_raw'),
-            ('rgb/camera_info', '/camera/camera/color/camera_info'),
+            ('rgb/image', '/camera/color/image_raw'),
+            ('depth/image', '/camera/aligned_depth_to_color/image_raw'),
+            ('rgb/camera_info', '/camera/color/camera_info'),
             ('odom', '/diff_drive_controller/odom')
         ],
-        arguments=['-d']
+        condition=UnlessCondition(delete_db)
     )
+
 
     realsense_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([os.path.join(
@@ -154,6 +182,8 @@ def generate_launch_description():
             'align_depth.enable':'true',
             'depth_module.depth_profile':'640x480x30',
             'rgb_camera.color_profile':'640x480x30',
+            'camera_name': 'camera',
+            'camera_namespace': '',
             'pointcloud.enable':'true'
             }.items(),
         )
@@ -167,6 +197,7 @@ def generate_launch_description():
         light_control,
         realsense_launch,
         rtabmap_node,
+        rtabmap_node_d,
     ]
 
     return LaunchDescription(

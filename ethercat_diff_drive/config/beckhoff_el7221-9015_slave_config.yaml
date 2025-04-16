@@ -26,9 +26,9 @@ rpdo:  # RxPDO = receive PDO Mapping
       - {index: 0x6040, sub_index: 0, type: uint16, default: 0}  # Control word
   - index: 0x1601
     channels:
-#      - {index: 0x60ff, sub_index: 0, type: int32, command_interface: velocity, factor: 2.503290804e6, default: 0}  # Target velocity
-
-     - {index: 0x60ff, sub_index: 0, type: int32, command_interface: velocity, factor: 976837, default: 0}  # Target velocity
+      #- {index: 0x60ff, sub_index: 0, type: int32, command_interface: velocity, factor: 2.503290804e6, default: 0}  # Target velocity
+     #- {index: 0x60ff, sub_index: 0, type: int32, command_interface: velocity, factor: 976837, default: 0}  # Target velocity
+      - {index: 0x60ff, sub_index: 0, type: int32, command_interface: velocity, factor: 1.953040327e6 , default: 0}  # Target velocity (60 (dişli motor tarafı) x 16 (motor gear head) x velocity encoder reso (268435) / (2 x pi x 21 ( disli teker tarafi)) )
   # - index: 0x1608
   #   channels:
       # - {index: 0x6060, sub_index: 0, type: int8, default: 9}  # Mode of operation
@@ -40,11 +40,11 @@ tpdo:  # TxPDO = transmit PDO Mapping
   - index: 0x1a01
     channels:      
 #      - {index: 0x6064, sub_index: 0, type: uint32, state_interface: position, factor: 970.972242686e-9}  # Position actual value
-
-      - {index: 0x6064, sub_index: 0, type: int32, state_interface: position, factor: 131.077459899e-9}  # Position actual value (2*PI*21/60x16/encoder_reso)
-  # - index: 0x1a02
-  #   channels:      
-  #     - {index: 0x606c, sub_index: 0, type: int32, state_interface: velocity, factor: 0.00424}  # Velocity actual value
+      - {index: 0x6064, sub_index: 0, type: uint32, state_interface: position, factor: 131.077459899e-9}  # Position actual value (2*PI*21/60x16/encoder_reso)
+#       - {index: 0x6064, sub_index: 0, type: int32, state_interface: position, factor: 33.555829735e-6}  # Position actual value (2*PI*21/60x16/encoder_reso)
+  - index: 0x1a02
+    channels:      
+       - {index: 0x606c, sub_index: 0, type: int32, state_interface: velocity, factor: 512.022197532e-9}  # Velocity actual value
 sm:  # Sync Manager
   - {index: 0, type: output, pdo: ~, watchdog: disable}
   - {index: 1, type: input, pdo: ~, watchdog: disable}
