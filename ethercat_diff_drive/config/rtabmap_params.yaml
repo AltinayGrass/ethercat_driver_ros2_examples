@@ -1,17 +1,28 @@
 rtabmap:
   ros__parameters:
-    subscribe_depth: true
+     #  ----  RGBD use -----
+    #subscribe_depth: false
+    #subscribe_rgb: false
+    #subscribe_rgbd: true
+    Rtabmap/DetectionRate: "1.0"
     subscribe_scan: false
+
     subscribe_scan_cloud: false
+    #approx_sync: true
+    gen_scan: true
+    gen_scan_min_depth: 0.4
 
     frame_id: "base_link"
     odom_frame_id: "odom"
 
-    Mem/IncrementalMemory: "true"
     RGBD/LinearUpdate: "0.1"
     RGBD/AngularUpdate: "0.1"
+    RGBD/OptimizeFromGraphEnd: "false"
+    Reg/Force3DoF: "true"
     Reg/Strategy: "0"  #0 Vis 1 ICP 2 VisICP
-    Grid/FromDepth: "false"
+    Grid/FromDepth: "true"
     Grid/ScanDecimation: "0"
     Grid/Sensor: "1"
-    Grid/RangeMax: "5.0"
+    Grid/RangeMax: "3.0"
+    Vis/minInLiers: "12"
+

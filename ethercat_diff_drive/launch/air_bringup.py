@@ -143,12 +143,16 @@ def generate_launch_description():
         name='rtabmap',
         output='screen',
         parameters=[
-            rtabmap_params
+            rtabmap_params,
+            {'Mem/IncrementalMemory': 'true'}, # Haritayı güncelle (SLAM Modu)
+            {'MinObstacleHeight': '0.06'},
+            {'MaxObstacleHeight': '1.06'},
             ],
         remappings=[
             ('rgb/image', '/camera/color/image_raw'),
             ('depth/image', '/camera/aligned_depth_to_color/image_raw'),
             ('rgb/camera_info', '/camera/color/camera_info'),
+            # ('rgbd_image', '/camera/rgbd'),
             ('odom', '/diff_drive_controller/odom')
         ],
         arguments=['-d'],
@@ -161,12 +165,17 @@ def generate_launch_description():
         name='rtabmap',
         output='screen',
         parameters=[
-            rtabmap_params
+            rtabmap_params,
+            {'Mem/IncrementalMemory': 'false'}, # Haritayı güncelleme
+            #{'Mem/IncrementalMemory': 'true'}, # Haritayı güncelle (SLAM Modu)
+            {'MinObstacleHeight': '0.06'},
+            {'MaxObstacleHeight': '1.06'},            
             ],
         remappings=[
             ('rgb/image', '/camera/color/image_raw'),
             ('depth/image', '/camera/aligned_depth_to_color/image_raw'),
             ('rgb/camera_info', '/camera/color/camera_info'),
+            # ('rgbd_image', '/camera/rgbd'),
             ('odom', '/diff_drive_controller/odom')
         ],
         condition=UnlessCondition(delete_db)
@@ -179,13 +188,53 @@ def generate_launch_description():
                 'launch'),
                 '/rs_launch.py']),
         launch_arguments={
+            'enable_rgbd': 'true',
+            'enable_sync': 'true',
             'align_depth.enable':'true',
-            'depth_module.depth_profile':'640x480x30',
-            'rgb_camera.color_profile':'640x480x30',
             'camera_name': 'camera',
             'camera_namespace': '',
-            'pointcloud.enable':'true'
+            # 'depth_module.depth_profile':'640x480x30',
+            # 'rgb_camera.color_profile':'640x480x30',
+            # 'pointcloud.enable':'true'
             }.items(),
+        )
+
+    depth_to_scan_params = {
+            'scan_height': 3,           # Görüntünün ortasından kullanılacak piksel satırı sayısı (1 ile başlayıp deneyebilirsiniz)
+            'range_min': 0.3,           # Minimum geçerli mesafe (metre) - Realsense D435i için uygun
+            'range_max': 4.0,           # Maksimum geçerli mesafe (metre) - Ortamınıza göre ayarlayın
+            'output_frame': 'camera_link', # Lazer taramasının yayınlanacağı TF frame'i - Çok Önemli!
+                                        # TF ağacınıza göre 'camera_link' veya başka bir frame olabilir.
+            'scan_time': 0.033,         # Tarama süresi (1/frekans), yaklaşık ~30Hz için
+            # 'inf_epsilon': 1.0        # Sonsuz değerler için epsilon (varsayılanı genellikle iyidir)
+            'use_sim_time': use_sim_time # Simülasyon zamanını kullan
+        }
+    
+    depthimage_to_laserscan_node = Node(
+        package='depthimage_to_laserscan',
+        executable='depthimage_to_laserscan_node',
+        name='depthimage_to_laserscan',
+        output='screen',
+        parameters=[depth_to_scan_params], # Parametreleri buradan veriyoruz
+        remappings=[
+            # Abone olunacak konular: Hizalanmış derinlik ve ilgili kamera bilgisi
+            ('depth', '/camera/aligned_depth_to_color/image_raw'),
+            ('depth_camera_info', '/camera/aligned_depth_to_color/camera_info'),
+            # Yayınlanacak konu: Standart lazer tarama konusu
+            ('scan', '/scan')
+        ]
+    )
+    static_tf_virtual_scan = Node(
+            package='tf2_ros',
+            executable='static_transform_publisher',
+            name='static_tf_pub_virtual_scan',
+            arguments=[
+                '0.3', '0.0', '0.75', # X, Y, Z offset (metre) base_link'e göre
+                '0', '0', '0',       # Roll, Pitch, Yaw (radyan) base_link'e göre
+                'base_link',         # Parent frame
+                'virtual_scan_frame' # Child frame (Yeni sanal çerçevemiz)
+            ],
+            output='screen'
         )
 
     nodes = [
@@ -194,8 +243,10 @@ def generate_launch_description():
         joint_state_broadcaster_spawner,
         diff_drive_controller_spawner,
         delay_gpio_after_diff_drive_controller_spawner,
+        #static_tf_virtual_scan,
         light_control,
         realsense_launch,
+        depthimage_to_laserscan_node,
         rtabmap_node,
         rtabmap_node_d,
     ]
