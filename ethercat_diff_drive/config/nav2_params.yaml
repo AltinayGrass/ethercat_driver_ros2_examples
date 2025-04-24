@@ -33,13 +33,13 @@ controller_server:
       movement_time_allowance: 10.0
     goal_checker:
       plugin: "nav2_controller::SimpleGoalChecker"
-      xy_goal_tolerance: 0.1
+      xy_goal_tolerance: 0.15
       yaw_goal_tolerance: 0.05
       stateful: True
     controller_plugins: ["FollowPath"]
     FollowPath:
       plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
-      desired_linear_vel: 0.25
+      desired_linear_vel: 0.15
       lookahead_dist: 0.6
       min_lookahead_dist: 0.3
       max_lookahead_dist: 0.9
@@ -118,8 +118,8 @@ local_costmap:
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         enabled: true
-        cost_scaling_factor: 3.0  # Maliyetin ne kadar hızlı düşeceğini belirler (ayarlayın)
-        inflation_radius: 0.35   # Engellerin etrafına eklenecek tampon bölge (metre) - Robot boyutuna göre ayarlayın
+        cost_scaling_factor: 5.0  # Maliyetin ne kadar hızlı düşeceğini belirler (ayarlayın)
+        inflation_radius: 0.5   # Engellerin etrafına eklenecek tampon bölge (metre) - Robot boyutuna göre ayarlayın
 
 global_costmap:
   global_costmap:
@@ -142,5 +142,5 @@ global_costmap:
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         enabled: true
-        cost_scaling_factor: 3.0  # Ayarlayın
-        inflation_radius: 0.35   # Ayarlayın
+        cost_scaling_factor: 5.0  # Ayarlayın
+        inflation_radius: 0.5   # Ayarlayın

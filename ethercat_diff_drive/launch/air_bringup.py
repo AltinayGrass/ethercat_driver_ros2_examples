@@ -200,7 +200,7 @@ def generate_launch_description():
         )
 
     depth_to_scan_params = {
-            'scan_height': 3,           # Görüntünün ortasından kullanılacak piksel satırı sayısı (1 ile başlayıp deneyebilirsiniz)
+            'scan_height': 2,           # Görüntünün ortasından kullanılacak piksel satırı sayısı (1 ile başlayıp deneyebilirsiniz)
             'range_min': 0.3,           # Minimum geçerli mesafe (metre) - Realsense D435i için uygun
             'range_max': 4.0,           # Maksimum geçerli mesafe (metre) - Ortamınıza göre ayarlayın
             'output_frame': 'camera_link', # Lazer taramasının yayınlanacağı TF frame'i - Çok Önemli!

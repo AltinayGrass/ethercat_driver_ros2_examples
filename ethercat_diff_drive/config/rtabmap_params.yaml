@@ -10,7 +10,7 @@ rtabmap:
     subscribe_scan_cloud: false
     #approx_sync: true
     gen_scan: true
-    gen_scan_min_depth: 0.4
+    gen_scan_min_depth: 0.3
 
     frame_id: "base_link"
     odom_frame_id: "odom"
@@ -23,6 +23,7 @@ rtabmap:
     Grid/FromDepth: "true"
     Grid/ScanDecimation: "0"
     Grid/Sensor: "1"
-    Grid/RangeMax: "3.0"
+    Grid/RayTracing: "true"
+    Grid/RangeMax: "4.0"
     Vis/minInLiers: "12"
 
