@@ -15,10 +15,11 @@
 import os
 
 from ament_index_python.packages import get_package_share_directory
+from launch_ros.actions import SetRemap
 
 from launch import LaunchDescription
 from launch.substitutions import Command, FindExecutable, PathJoinSubstitution, LaunchConfiguration, PythonExpression
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, RegisterEventHandler
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, RegisterEventHandler, GroupAction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.conditions import IfCondition, UnlessCondition
 from launch.event_handlers import OnProcessExit
@@ -151,7 +152,7 @@ def generate_launch_description():
         remappings=[
             ('rgb/image', '/camera/color/image_raw'),
             ('depth/image', '/camera/aligned_depth_to_color/image_raw'),
-            ('rgb/camera_info', '/camera/color/camera_info'),
+            ('rgb/camera_info', '/camera/color/camera_info'), #'/camera_info'),#
             # ('rgbd_image', '/camera/rgbd'),
             ('odom', '/diff_drive_controller/odom')
         ],
@@ -174,13 +175,35 @@ def generate_launch_description():
         remappings=[
             ('rgb/image', '/camera/color/image_raw'),
             ('depth/image', '/camera/aligned_depth_to_color/image_raw'),
-            ('rgb/camera_info', '/camera/color/camera_info'),
+            ('rgb/camera_info', '/camera/color/camera_info'), # '/camera_info'),
             # ('rgbd_image', '/camera/rgbd'),
             ('odom', '/diff_drive_controller/odom')
         ],
         condition=UnlessCondition(delete_db)
     )
 
+    realsense_launch_backup = GroupAction(
+        actions=[
+            SetRemap(src='/camera/color/camera_info',dst='camera_info'),
+            IncludeLaunchDescription(
+                    PythonLaunchDescriptionSource([os.path.join(
+                            get_package_share_directory('realsense2_camera'),
+                            'launch'),
+                            '/rs_launch.py']),
+                    launch_arguments={
+                        'enable_rgbd': 'true',
+                        'enable_sync': 'true',
+                        'align_depth.enable':'true',
+                        'camera_name': 'camera',
+                        'camera_namespace': '',
+                        # 'depth_module.depth_profile':'640x480x30',
+                        # 'rgb_camera.color_profile':'640x480x30',
+                        # 'pointcloud.enable':'true'
+                        }.items(),
+                    )
+        ]
+    
+    )
 
     realsense_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([os.path.join(
@@ -236,6 +259,47 @@ def generate_launch_description():
             ],
             output='screen'
         )
+    apriltag_ros_params = PathJoinSubstitution(
+        [
+            pkg_share,
+            "config",
+            "tags_36h11.yaml",
+        ]
+        )
+    
+    apriltag_ros_node = Node(
+            package='apriltag_ros',
+            executable='apriltag_node',
+            parameters=[apriltag_ros_params],
+            remappings=[('image_rect', '/camera/color/image_raw') ,
+                        ('camera_info', '/camera/color/camera_info'),
+                        ],
+        )
+    # apriltag_draw_node = Node(
+    #         package='apriltag_draw',
+    #         executable='apriltag_draw_node',
+    #         # prefix=['xterm -e gdb -ex run --args'],
+    #         namespace='camera/color',
+    #         # parameters=[{'image_transport': trans, 'max_queue_size': 200}],
+    #         remappings=[('tags', '/detections'),
+    #                     ('image_raw', '/camera/color/image_raw'),
+    #                     ],
+    #     )
+    
+    pkg_apriltag_draw = get_package_share_directory('apriltag_draw')
+
+    apriltag_draw_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(pkg_apriltag_draw, 'launch', 'draw.launch.py')
+        ),
+        # Pass the required launch arguments to draw.launch.py
+        launch_arguments={
+            # 'camera' argument for draw.launch.py mapped to the Realsense color image topic
+            'camera': '/camera/color', # Should match input to detector ideally
+            # 'tags' argument for draw.launch.py mapped to the detector's output topic
+            'tags': '/detections' # Default output topic of apriltag_node
+        }.items(),
+    )
 
     nodes = [
         control_node,
@@ -249,6 +313,8 @@ def generate_launch_description():
         depthimage_to_laserscan_node,
         rtabmap_node,
         rtabmap_node_d,
+        apriltag_ros_node,
+        apriltag_draw_launch,
     ]
 
     return LaunchDescription(
