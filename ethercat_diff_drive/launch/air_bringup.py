@@ -18,7 +18,7 @@ from ament_index_python.packages import get_package_share_directory
 from launch_ros.actions import SetRemap
 
 from launch import LaunchDescription
-from launch.substitutions import Command, FindExecutable, PathJoinSubstitution, LaunchConfiguration, PythonExpression
+from launch.substitutions import Command, FindExecutable, PathJoinSubstitution, LaunchConfiguration, PathJoinSubstitution, TextSubstitution
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, RegisterEventHandler, GroupAction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.conditions import IfCondition, UnlessCondition
@@ -27,13 +27,40 @@ from launch.event_handlers import OnProcessExit
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
-from launch.substitutions import ThisLaunchFileDir
 
 def generate_launch_description():
 
     pkg_share = FindPackageShare(package='ethercat_diff_drive').find('ethercat_diff_drive')
     use_sim_time = LaunchConfiguration('use_sim_time', default='False')
 
+    camera_frame_type = LaunchConfiguration('camera_frame_type')
+    camera_ns = LaunchConfiguration('camera_ns')
+    tag_family = LaunchConfiguration('tag_family')
+    tag_id = LaunchConfiguration('tag_id')
+
+    declare_camera_frame_type_cmd = DeclareLaunchArgument(
+        name='camera_frame_type',
+        default_value='_optical_frame',
+        description='Type of camera frame to use (e.g., _depth_optical_frame, _optical_frame)'
+    )
+
+    declare_camera_ns_cmd = DeclareLaunchArgument(
+        name='camera_ns',
+        default_value='camera',
+        description='Namespace for the camera and AprilTag nodes'
+    )
+
+    declare_tag_family_cmd = DeclareLaunchArgument(
+        name='tag_family',
+        default_value='tag36h11',
+        description='Family of AprilTag being used'
+    )
+
+    declare_tag_id_cmd = DeclareLaunchArgument(
+        name='tag_id',
+        default_value='7',
+        description='ID of the AprilTag being used'
+    )
     declare_use_sim_time_cmd = DeclareLaunchArgument(
         name='use_sim_time',
         default_value='false',
@@ -58,6 +85,10 @@ def generate_launch_description():
 
     declared_arguments.append(declare_use_sim_time_cmd)
     declared_arguments.append(delete_db_arg)
+    declared_arguments.append(declare_camera_frame_type_cmd)
+    declared_arguments.append(declare_camera_ns_cmd)
+    declared_arguments.append(declare_tag_family_cmd)
+    declared_arguments.append(declare_tag_id_cmd)
 
     description_file = LaunchConfiguration('description_file')
 
@@ -300,6 +331,17 @@ def generate_launch_description():
             'tags': '/detections' # Default output topic of apriltag_node
         }.items(),
     )
+    
+    start_detected_dock_pose_publisher = Node(
+        package='light_control',
+        executable='detected_dock_pose_publisher',
+        parameters=[{
+            'parent_frame': [camera_ns, TextSubstitution(text='_color'), camera_frame_type],
+            'child_frame': [tag_family, TextSubstitution(text=':'), tag_id],
+            'publish_rate': 10.0
+        }],
+        output='screen'
+    )
 
     nodes = [
         control_node,
@@ -315,6 +357,7 @@ def generate_launch_description():
         rtabmap_node_d,
         apriltag_ros_node,
         apriltag_draw_launch,
+        start_detected_dock_pose_publisher,
     ]
 
     return LaunchDescription(

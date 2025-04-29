@@ -50,7 +50,15 @@ def generate_launch_description():
             output='screen',
             parameters=[nav2_params, {'use_sim_time': use_sim_time}]
         ),
-
+        
+        Node(
+            package='opennav_docking',
+            executable='opennav_docking',
+            name='docking_server',
+            output='screen',
+            parameters=[nav2_params, {'use_sim_time': use_sim_time}],
+            remappings=remappings + [('cmd_vel', '/diff_drive_controller/cmd_vel_unstamped' )],
+            ),
         # Node(
         #     package='nav2_costmap_2d',
         #     executable='nav2_costmap_2d',
@@ -90,6 +98,7 @@ def generate_launch_description():
                             'planner_server',
                             'bt_navigator',
                             'behavior_server',
+                            'docking_server',
                             # 'local_costmap',
                             # 'global_costmap'
                         ]}]
