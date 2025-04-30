@@ -118,8 +118,8 @@ local_costmap:
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         enabled: true
-        cost_scaling_factor: 5.0  # Maliyetin ne kadar hızlı düşeceğini belirler (ayarlayın)
-        inflation_radius: 0.5   # Engellerin etrafına eklenecek tampon bölge (metre) - Robot boyutuna göre ayarlayın
+        cost_scaling_factor: 3.0  # Maliyetin ne kadar hızlı düşeceğini belirler (ayarlayın)
+        inflation_radius: 0.475   # Engellerin etrafına eklenecek tampon bölge (metre) - Robot boyutuna göre ayarlayın
 
 global_costmap:
   global_costmap:
@@ -142,8 +142,8 @@ global_costmap:
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         enabled: true
-        cost_scaling_factor: 5.0  # Ayarlayın
-        inflation_radius: 0.5   # Ayarlayın
+        cost_scaling_factor: 3.0  # Ayarlayın
+        inflation_radius: 0.475   # Ayarlayın
 docking_server:
   ros__parameters:
     controller_frequency: 50.0
