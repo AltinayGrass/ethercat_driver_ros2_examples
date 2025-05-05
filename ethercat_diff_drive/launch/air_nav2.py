@@ -59,33 +59,6 @@ def generate_launch_description():
             parameters=[nav2_params, {'use_sim_time': use_sim_time}],
             remappings=remappings + [('cmd_vel', '/diff_drive_controller/cmd_vel_unstamped' )],
             ),
-        # Node(
-        #     package='nav2_costmap_2d',
-        #     executable='nav2_costmap_2d',
-        #     name='local_costmap', # Bu isim nav2_params.yaml'daki bölümle eşleşmeli
-        #     namespace='', # Global namespace
-        #     output='screen',
-        #     parameters=[nav2_params, {'use_sim_time': use_sim_time}],
-        #     remappings=remappings + [ # Costmap'in kendi çıktı konularını remapping yapmak iyi olabilir
-        #                  ('local_costmap/costmap_raw', 'local_costmap/costmap_raw'),
-        #                  ('local_costmap/costmap_updates', 'local_costmap/costmap_updates'),
-        #                  ('local_costmap/published_footprint', 'local_costmap/published_footprint')
-        #              ]
-        # ),
-        # Node(
-        #     package='nav2_costmap_2d',
-        #     executable='nav2_costmap_2d',
-        #     name='global_costmap', # Bu isim nav2_params.yaml'daki bölümle eşleşmeli
-        #     namespace='', # Global namespace
-        #     output='screen',
-        #     parameters=[nav2_params, {'use_sim_time': use_sim_time}],
-        #     remappings=remappings + [ # Costmap'in kendi çıktı konularını remapping yapmak iyi olabilir
-        #                  ('global_costmap/costmap_raw', 'global_costmap/costmap_raw'),
-        #                  ('global_costmap/costmap_updates', 'global_costmap/costmap_updates'),
-        #                  ('global_costmap/published_footprint', 'global_costmap/published_footprint')
-        #              ]
-        # ),
-
         Node(
             package='nav2_lifecycle_manager',
             executable='lifecycle_manager',

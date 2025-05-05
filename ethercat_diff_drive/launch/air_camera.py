@@ -1,24 +1,16 @@
 import os
 
 from ament_index_python.packages import get_package_share_directory
-# SetRemap artık doğrudan kullanılmıyor, kaldırılabilir
-# from launch_ros.actions import SetRemap
-
 from launch import LaunchDescription
-from launch.substitutions import Command, FindExecutable, PathJoinSubstitution, LaunchConfiguration, TextSubstitution, PythonExpression # PythonExpression eklendi
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, RegisterEventHandler, GroupAction
+from launch.substitutions import PathJoinSubstitution, LaunchConfiguration
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-# IfCondition ve UnlessCondition zaten vardı, PythonExpression için de gerekli olabilir
 from launch.conditions import IfCondition, UnlessCondition
-from launch.event_handlers import OnProcessExit
-
 from launch_ros.actions import Node
-from launch_ros.substitutions import FindPackageShare
-
 
 def generate_launch_description():
 
-    pkg_share = FindPackageShare(package='ethercat_diff_drive').find('ethercat_diff_drive')
+
     pkg_ethercat_diff_drive_dir = get_package_share_directory('ethercat_diff_drive') # Bunu kullanmak daha iyi
     pkg_realsense2_camera_dir = get_package_share_directory('realsense2_camera')
     pkg_apriltag_draw_dir = get_package_share_directory('apriltag_draw')
@@ -30,8 +22,7 @@ def generate_launch_description():
     tag_family = LaunchConfiguration('tag_family')
     tag_id = LaunchConfiguration('tag_id')
     delete_db = LaunchConfiguration('delete_db_on_start')
-    description_file = LaunchConfiguration('description_file')
-    camera_off = LaunchConfiguration('camera_off') # Yeni argümanı tanımla
+    realsense_qos_config = LaunchConfiguration('realsense_qos_config') # Yeni QoS config argümanı
 
     declared_arguments = []
     declared_arguments.append(
@@ -82,72 +73,16 @@ def generate_launch_description():
             description='ID of the AprilTag being used'
         )
     )
-    # --- YENİ: camera_off argümanı ---
+
     declared_arguments.append(
         DeclareLaunchArgument(
-            name='camera_off',
-            default_value='false', # Varsayılan olarak kamera AÇIK
-            description='If true, disables camera-related nodes (Realsense, RTABMap, AprilTag, etc.).'
+            name='realsense_qos_config',
+            default_value=PathJoinSubstitution([
+                pkg_ethercat_diff_drive_dir, 'config', 'realsense_qos_overrides.yaml'
+            ]),
+            description='Path to the Realsense QoS overrides configuration file.'
         )
     )
-
-    # --- URDF ve ros2_control ---
-    robot_description_content = Command(
-        [
-            PathJoinSubstitution([FindExecutable(name="xacro")]), " ",
-            PathJoinSubstitution([pkg_ethercat_diff_drive_dir, "description/config", description_file]),
-        ]
-    )
-    robot_description = {"robot_description": robot_description_content}
-
-    robot_controllers = PathJoinSubstitution([pkg_ethercat_diff_drive_dir, "config", "controllers_air.yaml"])
-
-    control_node = Node(
-        package="controller_manager",
-        executable="ros2_control_node",
-        parameters=[robot_description, robot_controllers],
-        output="both",
-    )
-
-    robot_state_pub_node = Node(
-        package="robot_state_publisher",
-        executable="robot_state_publisher",
-        output="both",
-        parameters=[{'use_sim_time': use_sim_time}, robot_description],
-    )
-
-    joint_state_broadcaster_spawner = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
-    )
-
-    diff_drive_controller_spawner = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=["diff_drive_controller", "--controller-manager", "/controller_manager"],
-    )
-
-    gpio_controller_spawner = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=["gpio_controller", "--controller-manager", "/controller_manager"],
-    )
-
-    delay_gpio_after_diff_drive_controller_spawner = RegisterEventHandler(
-        event_handler=OnProcessExit(
-            target_action=diff_drive_controller_spawner,
-            on_exit=[gpio_controller_spawner],
-        )
-    )
-
-    light_control_node = Node( # İsim verildi
-        package='light_control',
-        executable='light_control',
-        name='light_control',
-        output='screen'
-    )
-
     # --- RTAB-Map ---
     rtabmap_params = PathJoinSubstitution([
         pkg_ethercat_diff_drive_dir, 'config', 'rtabmap_params.yaml'
@@ -176,9 +111,7 @@ def generate_launch_description():
         ],
         arguments=['-d'], # Veritabanını sil
         # --- Koşul: delete_db true VE camera_off false ise çalıştır ---
-        condition=IfCondition(PythonExpression(
-            ["'", delete_db, "' == 'true' and '", camera_off, "' == 'false'"]
-        ))
+        condition=IfCondition(delete_db)
     )
 
     # Koşul 2: delete_db == false VE camera_off == false
@@ -202,9 +135,7 @@ def generate_launch_description():
             ('imu', '/camera/imu') # IMU remapping
         ],
         # --- Koşul: delete_db false VE camera_off false ise çalıştır ---
-        condition=IfCondition(PythonExpression(
-            ["'", delete_db, "' == 'false' and '", camera_off, "' == 'false'"]
-        ))
+        condition=UnlessCondition(delete_db)
     )
 
     # --- Realsense Kamera ---
@@ -215,24 +146,13 @@ def generate_launch_description():
         ),
         launch_arguments={
             # QoS için config_file argümanı burada eklenebilir (önceki cevaplardaki gibi)
-            'enable_color': 'true',
-            'enable_depth': 'true',
+            'enable_rgbd': 'true',
             'enable_sync': 'true',
             'align_depth.enable':'true',
-            'enable_gyro': 'true', # IMU önerilir
-            'enable_accel': 'true',# IMU önerilir
-            'unite_imu_method': 'linear_interpolation',
             'camera_name': 'camera',
-            'camera_namespace': camera_ns, # Argümanı kullan
-            'publish_tf': 'true',
-            'tf_publish_rate': '30.0',
-            'pointcloud.enable': 'false',
-            'use_sim_time': use_sim_time,
-            # 'depth_module.profile':'640x480x30',
-            # 'rgb_camera.profile':'640x480x30',
+            'camera_namespace': '',
+            'config_file': realsense_qos_config,
         }.items(),
-        # --- Koşul: camera_off false ise çalıştır ---
-        condition=UnlessCondition(camera_off)
     )
 
     # --- Depth to LaserScan ---
@@ -256,8 +176,6 @@ def generate_launch_description():
             ('depth_camera_info', [camera_ns, '/aligned_depth_to_color/camera_info']), # Namespace kullanıldı
             ('scan', '/scan')
         ],
-        # --- Koşul: camera_off false ise çalıştır ---
-        condition=UnlessCondition(camera_off)
     )
 
     # --- Apriltag ---
@@ -281,8 +199,6 @@ def generate_launch_description():
             ('camera_info', 'color/camera_info'),
             ('detections', '/detections') # Global topic name for detections
         ],
-        # --- Koşul: camera_off false ise çalıştır ---
-        condition=UnlessCondition(camera_off)
     )
 
     # --- Apriltag Draw ---
@@ -295,8 +211,6 @@ def generate_launch_description():
             'image_topic': [camera_ns, '/color/image_raw'],
             'detections_topic': '/detections'
         }.items(),
-        # --- Koşul: camera_off false ise çalıştır ---
-        condition=UnlessCondition(camera_off)
     )
 
     # --- Detected Dock Pose Publisher ---
@@ -317,19 +231,10 @@ def generate_launch_description():
             'use_sim_time': use_sim_time
         }],
         output='screen',
-        # --- Koşul: camera_off false ise çalıştır ---
-        condition=UnlessCondition(camera_off)
     )
 
     # --- Başlatılacak Düğümlerin Listesi ---
     nodes = [
-        control_node,
-        robot_state_pub_node,
-        joint_state_broadcaster_spawner,
-        diff_drive_controller_spawner,
-        delay_gpio_after_diff_drive_controller_spawner,
-        light_control_node, # İsim verildi
-        # --- Koşullu Düğümler/Launch'lar ---
         realsense_launch,
         depthimage_to_laserscan_node,
         rtabmap_node, # Koşulu içinde tanımlı

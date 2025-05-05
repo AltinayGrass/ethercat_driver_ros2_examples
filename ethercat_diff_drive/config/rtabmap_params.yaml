@@ -4,11 +4,11 @@ rtabmap:
     #subscribe_depth: false
     #subscribe_rgb: false
     #subscribe_rgbd: true
-    Rtabmap/DetectionRate: "1.0"
+    Rtabmap/DetectionRate: "2.0"
     subscribe_scan: false
 
     subscribe_scan_cloud: false
-    #approx_sync: true
+    approx_sync: false
     gen_scan: true
     gen_scan_min_depth: 0.3
 
@@ -25,5 +25,5 @@ rtabmap:
     Grid/Sensor: "1"
     Grid/RayTracing: "true"
     Grid/RangeMax: "4.0"
-    Vis/minInLiers: "12"
+    Vis/MinInliers: "12"
 

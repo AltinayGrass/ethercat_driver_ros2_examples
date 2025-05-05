@@ -1,0 +1,42 @@
+/camera:
+  ros__parameters:
+    qos_overrides:
+      # --- Görüntü Akışları (Sensor Data - Best Effort) ---
+      /camera/color/image_raw:
+        publisher:
+          reliability: best_effort
+          history: keep_last
+          depth: 5
+          durability: volatile # Sensör verisi için genellikle volatile
+      /camera/depth/image_rect_raw: # Eğer hizalanmamış derinlik de açıksa
+        publisher:
+          reliability: best_effort
+          history: keep_last
+          depth: 5
+          durability: volatile
+      /camera/aligned_depth_to_color/image_raw: # Hizalanmış Derinlik
+        publisher:
+          reliability: best_effort
+          history: keep_last
+          depth: 5
+          durability: volatile
+
+      # --- Kamera Bilgisi (Genellikle Reliable daha iyidir) ---
+      /camera/color/camera_info:
+        publisher:
+          reliability: reliable # Kamera bilgisi kaybolmamalı
+          history: keep_last
+          depth: 1
+          durability: volatile # Veya transient_local olabilir
+      /camera/depth/camera_info: # Eğer hizalanmamış derinlik açıksa
+         publisher:
+          reliability: reliable
+          history: keep_last
+          depth: 1
+          durability: volatile
+      /camera/aligned_depth_to_color/camera_info: # Hizalanmış Derinlik Bilgisi
+        publisher:
+          reliability: reliable
+          history: keep_last
+          depth: 1
+          durability: volatile
