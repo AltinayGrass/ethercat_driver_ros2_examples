@@ -188,15 +188,14 @@ def generate_launch_description():
         package='apriltag_ros',
         executable='apriltag_node',
         name='apriltag_node',
-        namespace=camera_ns, # Node'u da namespace içine al
         parameters=[
             apriltag_ros_params,
             {'use_sim_time': use_sim_time}
             ],
         remappings=[
             # Namespace içinde olduğu için göreli isimler kullanılabilir
-            ('image_rect', 'color/image_raw') ,
-            ('camera_info', 'color/camera_info'),
+            ('image_rect', '/camera/color/image_raw') ,
+            ('camera_info', '/camera/color/camera_info'),
             ('detections', '/detections') # Global topic name for detections
         ],
     )
@@ -208,8 +207,8 @@ def generate_launch_description():
         ),
         launch_arguments={
             # draw.launch.py'nin beklediği argümanları doğru şekilde iletin
-            'image_topic': [camera_ns, '/color/image_raw'],
-            'detections_topic': '/detections'
+            'camera': '/camera/color',
+            'tags': '/detections'
         }.items(),
     )
 
