@@ -2,7 +2,7 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.substitutions import PathJoinSubstitution, LaunchConfiguration
+from launch.substitutions import PathJoinSubstitution, LaunchConfiguration, TextSubstitution
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.conditions import IfCondition, UnlessCondition
@@ -16,7 +16,6 @@ def generate_launch_description():
     pkg_apriltag_draw_dir = get_package_share_directory('apriltag_draw')
 
     # --- Launch Argüman Tanımlamaları ---
-    use_sim_time = LaunchConfiguration('use_sim_time') # Varsayılan değer Declare'de
     camera_frame_type = LaunchConfiguration('camera_frame_type')
     camera_ns = LaunchConfiguration('camera_ns')
     tag_family = LaunchConfiguration('tag_family')
@@ -97,7 +96,6 @@ def generate_launch_description():
         output='screen',
         parameters=[
             rtabmap_params,
-            {'use_sim_time': use_sim_time}, # Eklendi
             {'Mem/IncrementalMemory': 'true'}, # SLAM Modu
             # {'MinObstacleHeight': '0.06'}, # Bunlar Nav2 Costmap içindir
             # {'MaxObstacleHeight': '1.06'},
@@ -122,7 +120,6 @@ def generate_launch_description():
         output='screen',
         parameters=[
             rtabmap_params,
-            {'use_sim_time': use_sim_time}, # Eklendi
             {'Mem/IncrementalMemory': 'false'}, # Localization Modu (veya YAML'da ayarla)
             # {'MinObstacleHeight': '0.06'}, # Nav2
             # {'MaxObstacleHeight': '1.06'}, # Nav2
@@ -162,7 +159,6 @@ def generate_launch_description():
             'range_max': 4.0,
             'output_frame': 'camera_link', # TF ağacınızla eşleşmeli!
             'scan_time': 0.033,
-            'use_sim_time': use_sim_time
         }
 
     depthimage_to_laserscan_node = Node(
@@ -190,10 +186,8 @@ def generate_launch_description():
         name='apriltag_node',
         parameters=[
             apriltag_ros_params,
-            {'use_sim_time': use_sim_time}
             ],
         remappings=[
-            # Namespace içinde olduğu için göreli isimler kullanılabilir
             ('image_rect', '/camera/color/image_raw') ,
             ('camera_info', '/camera/color/camera_info'),
             ('detections', '/detections') # Global topic name for detections
@@ -206,28 +200,21 @@ def generate_launch_description():
             os.path.join(pkg_apriltag_draw_dir, 'launch', 'draw.launch.py')
         ),
         launch_arguments={
-            # draw.launch.py'nin beklediği argümanları doğru şekilde iletin
             'camera': '/camera/color',
             'tags': '/detections'
         }.items(),
     )
 
     # --- Detected Dock Pose Publisher ---
-    # TF frame isimlerini birleştirmek için PathJoinSubstitution veya PythonExpression kullanmak daha iyi
-    parent_frame_sub = PathJoinSubstitution([camera_ns, '_color', camera_frame_type])
-    child_frame_sub = PathJoinSubstitution([tag_family, ':', tag_id])
 
     start_detected_dock_pose_publisher = Node(
         package='light_control', # Paketin adı doğru mu?
         executable='detected_dock_pose_publisher',
         name='detected_dock_pose_publisher',
         parameters=[{
-            # 'parent_frame': [camera_ns, TextSubstitution(text='_color'), camera_frame_type], # Bu liste birleştirilmez
-            # 'child_frame': [tag_family, TextSubstitution(text=':'), tag_id], # Bu liste birleştirilmez
-            'parent_frame': parent_frame_sub, # Birleştirilmiş substituion
-            'child_frame': child_frame_sub,   # Birleştirilmiş substituion
+            'parent_frame': [camera_ns, TextSubstitution(text='_color'), camera_frame_type], # Bu liste birleştirilmez
+            'child_frame': [tag_family, TextSubstitution(text=':'), tag_id], # Bu liste birleştirilmez
             'publish_rate': 10.0,
-            'use_sim_time': use_sim_time
         }],
         output='screen',
     )
