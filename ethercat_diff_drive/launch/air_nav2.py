@@ -48,7 +48,8 @@ def generate_launch_description():
             package='nav2_behaviors',
             executable='behavior_server',
             output='screen',
-            parameters=[nav2_params, {'use_sim_time': use_sim_time}]
+            parameters=[nav2_params, {'use_sim_time': use_sim_time}],
+            remappings=remappings + [('cmd_vel', '/diff_drive_controller/cmd_vel_unstamped' )],
         ),
         
         Node(

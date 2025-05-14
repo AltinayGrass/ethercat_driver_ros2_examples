@@ -105,7 +105,7 @@ def generate_launch_description():
             ('depth/image', '/camera/aligned_depth_to_color/image_raw'),
             ('rgb/camera_info', '/camera/color/camera_info'),
             ('odom', '/diff_drive_controller/odom'),
-            ('imu', '/camera/imu') # IMU remapping
+            ('imu', '/imu/data') # IMU remapping
         ],
         arguments=['-d'], # Veritabanını sil
         # --- Koşul: delete_db true VE camera_off false ise çalıştır ---
@@ -129,7 +129,7 @@ def generate_launch_description():
             ('depth/image', '/camera/aligned_depth_to_color/image_raw'),
             ('rgb/camera_info', '/camera/color/camera_info'),
             ('odom', '/diff_drive_controller/odom'),
-            ('imu', '/camera/imu') # IMU remapping
+            ('imu', '/imu/data') # IMU remapping
         ],
         # --- Koşul: delete_db false VE camera_off false ise çalıştır ---
         condition=UnlessCondition(delete_db)
@@ -143,9 +143,12 @@ def generate_launch_description():
         ),
         launch_arguments={
             # QoS için config_file argümanı burada eklenebilir (önceki cevaplardaki gibi)
-            'enable_rgbd': 'true',
+            # 'enable_rgbd': 'true',
             'enable_sync': 'true',
             'align_depth.enable':'true',
+            'enable_gyro': 'true',
+            'enable_accel': 'true',
+            'unite_imu_method': '2',
             'camera_name': 'camera',
             'camera_namespace': '',
             'config_file': realsense_qos_config,
@@ -219,6 +222,23 @@ def generate_launch_description():
         output='screen',
     )
 
+        # Compute quaternion of the IMU
+    imu_madgwick = Node (
+        package='imu_filter_madgwick', 
+        executable='imu_filter_madgwick_node', 
+        output='screen',
+        parameters=[{'use_mag': False, 
+                    'world_frame':'enu', 
+                    'fixed_frame': 'camera_imu_frame'}],
+        remappings=[('imu/data_raw', '/camera/imu')]
+    )
+    # static_map_madgwick= Node (
+    #     package= 'tf2_ros',
+    #     executable='static_transform_publisher',
+    #     name='static_tf_odom_madgwick',
+    #     arguments=['0.29', '0.04', '0.46', '0', '0', '0', 'map','odom_madgwick'],
+    # )
+
     # --- Başlatılacak Düğümlerin Listesi ---
     nodes = [
         realsense_launch,
@@ -228,6 +248,8 @@ def generate_launch_description():
         apriltag_ros_node,
         apriltag_draw_launch,
         start_detected_dock_pose_publisher,
+        imu_madgwick,
+        # static_map_madgwick,
     ]
 
     return LaunchDescription(declared_arguments + nodes)
